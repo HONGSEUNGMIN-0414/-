@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>물품 주문 수합 관리</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  .app-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .app-header h1 { font-size: 22px; font-weight: 600; }
+  .app-header p { font-size: 13px; color: #666; margin-top: 4px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn { padding: 8px 18px; font-size: 13px; border-radius: 8px; cursor: pointer; font-family: inherit; transition: all 0.15s; border: 1px solid #ddd; background: #fff; color: #555; }
+  .btn:hover { background: #f0f0ee; }
+  .btn-danger { background: #fff; color: #e24b4a; border-color: #f09595; }
+  .btn-danger:hover { background: #fff0f0; }
+  .btn-success { background: #0F6E56; color: #fff; border-color: #0F6E56; font-weight: 600; }
+  .btn-success:hover { opacity: 0.88; background: #0F6E56; }
+  .btn-refresh { background: #185FA5; color: #fff; border-color: #185FA5; font-weight: 600; }
+  .btn-refresh:hover { opacity: 0.88; background: #185FA5; }
+  .notice { background: #eef5fc; border: 0.5px solid #b5d4f4; border-left: 3px solid #378ADD; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #185FA5; margin-bottom: 1.5rem; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .stat-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 14px 16px; }
+  .stat-card .label { font-size: 12px; color: #999; margin-bottom: 5px; }
+  .stat-card .value { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+  .stat-card .value.blue { color: #185FA5; }
+  .stat-card .value.green { color: #0F6E56; }
+  .stat-card .value.amber { color: #BA7517; }
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 1.5rem; border-bottom: 1px solid #e0e0e0; }
+  .tab { padding: 9px 18px; font-size: 14px; cursor: pointer; border: none; background: transparent; color: #888; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s; }
+  .tab.active { color: #185FA5; border-bottom: 2px solid #185FA5; font-weight: 600; }
+  .tab:hover:not(.active) { color: #333; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+  .filter-bar input, .filter-bar select { padding: 7px 10px; font-size: 13px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; outline: none; font-family: inherit; transition: border-color 0.15s; }
+  .filter-bar input:focus, .filter-bar select:focus { border-color: #378ADD; }
+  .filter-bar input { flex: 1; min-width: 160px; }
+  .table-wrap { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; overflow: hidden; }
+  table.main-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.main-table th { padding: 10px 12px; background: #f8f8f6; color: #888; font-weight: 600; font-size: 11px; text-align: left; border-bottom: 1px solid #eee; white-space: nowrap; }
+  table.main-table td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; vertical-align: top; }
+  table.main-table tr:last-child td { border-bottom: none; }
+  table.main-table tr:hover td { background: #fafafa; }
+  .status-select { font-size: 12px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; font-family: inherit; }
+  .items-mini { font-size: 12px; color: #666; }
+  .items-mini li { list-style: none; padding: 1px 0; }
+  .store-link { color: #185FA5; text-decoration: underline; font-size: 12px; word-break: break-all; }
+  .total-amt { font-weight: 600; color: #185FA5; white-space: nowrap; }
+  .teacher-name { font-weight: 600; color: #1a1a1a; }
+  .subject-name { font-size: 12px; color: #999; }
+  .action-btns { display: flex; gap: 6px; }
+  .icon-btn { width: 28px; height: 28px; border: 1px solid #e0e0e0; border-radius: 6px; background: transparent; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .icon-btn:hover { background: #f5f5f3; }
+  .icon-btn.del:hover { background: #fff0f0; border-color: #f09595; color: #e24b4a; }
+  .empty-msg { text-align: center; padding: 3rem 0; color: #bbb; font-size: 14px; }
+  .loading-msg { text-align: center; padding: 3rem 0; color: #999; font-size: 14px; }
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; align-items: center; justify-content: center; }
+  .modal-bg.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; padding: 1.5rem; width: min(680px, 95vw); max-height: 88vh; overflow-y: auto; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+  .modal-header h2 { font-size: 17px; font-weight: 600; }
+  .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #aaa; line-height: 1; padding: 4px; }
+  .close-btn:hover { color: #555; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+  .detail-field { display: flex; flex-direction: column; gap: 3px; }
+  .detail-field .dl { font-size: 11px; color: #aaa; }
+  .detail-field .dv { font-size: 14px; color: #1a1a1a; word-break: break-all; }
+  .detail-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
+  .detail-table th { padding: 7px 8px; background: #f8f8f6; color: #888; font-weight: 600; font-size: 11px; text-align: left; border-bottom: 1px solid #eee; }
+  .detail-table td { padding: 7px 8px; border-bottom: 1px solid #f5f5f5; }
+  .detail-table tr:last-child td { border-bottom: none; }
+  .detail-total { text-align: right; font-size: 14px; margin-top: 8px; }
+  .detail-total strong { color: #185FA5; font-size: 16px; }
+  .budget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .budget-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 14px 16px; }
+  .budget-card .bname { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #1a1a1a; }
+  .budget-card .brow { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: #666; border-bottom: 1px solid #f5f5f5; }
+  .budget-card .brow:last-child { border-bottom: none; font-weight: 600; color: #185FA5; }
+  .input-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .input-card h2 { font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
+  .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .ifield { display: flex; flex-direction: column; gap: 5px; }
+  .ifield label { font-size: 13px; color: #555; }
+  .ifield input, .ifield select { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; outline: none; transition: border-color 0.15s; font-family: inherit; }
+  .ifield input:focus, .ifield select:focus { border-color: #378ADD; }
+  .ifield.full { grid-column: 1 / -1; }
+  .sub-items-header { display: grid; grid-template-columns: 28px 1fr 80px 56px 88px 76px 30px; gap: 6px; padding: 5px 4px 7px; font-size: 11px; color: #aaa; border-bottom: 1px solid #f0f0f0; margin-bottom: 5px; }
+  .sub-item-row { display: grid; grid-template-columns: 28px 1fr 80px 56px 88px 76px 30px; gap: 6px; align-items: center; padding: 3px 0; border-bottom: 1px solid #f8f8f8; }
+  .sub-item-row:last-child { border-bottom: none; }
+  .sub-item-num { font-size: 11px; color: #ccc; text-align: center; }
+  .sub-item-row input { padding: 4px 6px; font-size: 12px; height: 28px; border: 1px solid #e0e0e0; border-radius: 6px; outline: none; font-family: inherit; }
+  .sub-item-row input:focus { border-color: #378ADD; }
+  .del-row-btn { width: 26px; height: 26px; border: 1px solid #e0e0e0; border-radius: 6px; background: transparent; color: #ccc; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .del-row-btn:hover { background: #fff0f0; border-color: #f09595; color: #e24b4a; }
+  .add-sub-btn { width: 100%; padding: 7px; font-size: 12px; color: #999; border: 1.5px dashed #ddd; border-radius: 7px; background: transparent; cursor: pointer; margin-top: 8px; transition: all 0.15s; font-family: inherit; }
+  .add-sub-btn:hover { background: #f5f5f3; border-color: #bbb; }
+  .sub-summary { display: flex; gap: 10px; margin: 12px 0; flex-wrap: wrap; }
+  .sub-sum-chip { background: #f5f5f3; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #666; }
+  .sub-sum-chip strong { color: #185FA5; }
+  .form-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .year-tab-bar { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .year-tab-btn {
+    padding: 7px 18px; font-size: 13px; font-weight: 500;
+    border: 1px solid #ddd; border-radius: 99px;
+    background: #fff; color: #888; cursor: pointer;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .year-tab-btn:hover { border-color: #185FA5; color: #185FA5; }
+  .year-tab-btn.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .year-tab-btn .cnt { font-size: 11px; opacity: 0.8; margin-left: 4px; }
+
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: 1fr 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+    table.main-table { font-size: 12px; }
+    table.main-table th, table.main-table td { padding: 8px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="app-header">
+    <div>
+      <h1>물품 주문 수합 관리</h1>
+      <p>제출된 물품 신청서를 수합하고 처리 상태를 관리합니다. 도착 물품은 N104에 보관됩니다.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-refresh" onclick="loadOrders()">🔄 새로고침</button>
+      <button class="btn" onclick="exportCSV()">CSV 내보내기</button>
+      <button class="btn btn-danger" onclick="clearAll()">전체 초기화</button>
+    </div>
+  </div>
+  <div class="notice">※ 매주 월, 목에 품의 상신합니다.</div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="label">전체 신청 건수</div><div class="value blue" id="stat-total">0</div></div>
+    <div class="stat-card"><div class="label">처리 대기</div><div class="value amber" id="stat-pending">0</div></div>
+    <div class="stat-card"><div class="label">주문 완료</div><div class="value blue" id="stat-ordered">0</div></div>
+    <div class="stat-card"><div class="label">도착 완료</div><div class="value green" id="stat-arrived">0</div></div>
+    <div class="stat-card"><div class="label">총 예상금액</div><div class="value blue" id="stat-amount">0원</div></div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('add')">직접 입력</button>
+    <button class="tab" onclick="switchTab('list')">신청 목록</button>
+    <button class="tab" onclick="switchTab('budget')">예산 항목별 현황</button>
+  </div>
+
+  <div id="panel-add" class="panel active">
+    <div class="input-card">
+      <h2>신청자 정보</h2>
+      <div class="input-grid">
+        <div class="ifield"><label>년도</label>
+          <input type="text" id="a-year" readonly style="background:#f8f8f8;color:#185FA5;font-weight:600;cursor:default;" />
+        </div>
+        <div class="ifield"><label>담당교사 *</label><input type="text" id="a-teacher" placeholder="예) 김○○" /></div>
+        <div class="ifield"><label>과목</label><input type="text" id="a-subject" placeholder="예) 생물Ⅱ" /></div>
+        <div class="ifield"><label>인원수</label><input type="number" id="a-headcount" placeholder="예) 30" min="1" /></div>
+      </div>
+    </div>
+    <div class="input-card">
+      <h2>예산 항목</h2>
+      <div class="ifield">
+        <label>예산 항목 선택 *</label>
+        <select id="a-budget">
+          <option value="">-- 선택하세요 --</option>
+          
+          <option>가정교육재료비</option>
+          <option>과학기술과 기자재</option>
+          <option>과학기술과수행평가운영</option>
+          <option>기술교육재료비</option>
+          <option>로봇하드웨어교육재료비</option>
+          <option>메이커교육재료비</option>
+          <option>물리교육재료비</option>
+          <option>생명과학교육재료비</option>
+          <option>실험실습역량인증</option>
+          <option>안전도구함 물품구매</option>
+          <option>융합과학탐구교육재료비(물,화,생,공)</option>
+          <option>인공지능로봇제작</option>
+          <option>정보과제연구 발표회</option>
+          <option>정보과제연구교육재료비</option>
+          <option>정보교육재료비</option>
+          <option>지식재산일반교육재료비</option>
+          <option>창의공학설계교육재료비</option>
+          <option>통합과학/과학탐구교육재료비</option>
+          <option>행사운영 및 재료비</option>
+          <option>화학교육재료비</option>
+          <option>화학생명과학안전소모품</option>
+          <option>방과후 재료비</option>
+        
+        </select>
+      </div>
+    </div>
+    <div class="input-card">
+      <h2>물품 목록</h2>
+      <div class="sub-items-header">
+        <span>No.</span><span>품명</span><span>규격</span><span>수량</span><span>예산단가</span><span>배송비</span><span></span>
+      </div>
+      <div id="a-items-container"></div>
+      <button class="add-sub-btn" onclick="addSubRow()">+ 물품 추가</button>
+      <div class="sub-summary">
+        <div class="sub-sum-chip">물품 수 <strong id="a-sum-count">0건</strong></div>
+        <div class="sub-sum-chip">배송비 <strong id="a-sum-ship">0원</strong></div>
+        <div class="sub-sum-chip">총 예상금액 <strong id="a-sum-total">0원</strong></div>
+      </div>
+    </div>
+    <div class="input-card">
+      <h2>구매처 / 비고</h2>
+      <div class="input-grid">
+        <div class="ifield full"><label>사이트 URL *</label><input type="url" id="a-storeUrl" placeholder="예) https://www.coupang.com/..." /></div>
+        <div class="ifield full"><label>비고</label><input type="text" id="a-memo" placeholder="기타 특이사항..." /></div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="resetAddForm()">초기화</button>
+      <button class="btn btn-success" id="add-btn" onclick="submitAddForm()">신청서 등록</button>
+    </div>
+  </div>
+
+  <div id="panel-list" class="panel">
+    <div id="year-tabs" class="year-tab-bar"></div>
+    <div class="filter-bar">
+      <input type="text" id="search" placeholder="교사명, 품명, 예산항목 검색..." oninput="renderList()" />
+
+      <select id="filter-status" onchange="renderList()">
+        <option value="">전체 상태</option>
+        <option value="pending">처리 대기</option>
+        <option value="ordered">주문 완료</option>
+        <option value="arrived">도착 완료</option>
+      </select>
+      <select id="filter-budget" onchange="renderList()">
+        <option value="">전체 예산</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table class="main-table">
+        <thead>
+          <tr><th>No.</th><th>담당교사</th><th>예산 항목</th><th>물품 요약</th><th>사이트</th><th>총액</th><th>상태</th><th>작업</th></tr>
+        </thead>
+        <tbody id="orders-tbody"><tr><td colspan="9" class="loading-msg">불러오는 중...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="panel-budget" class="panel">
+    <div class="budget-grid" id="budget-grid"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">상세 보기</h2>
+      <button class="close-btn" onclick="closeModalDirect()">×</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbw6ytkJjXsMyqnwM6oTmrtPB1wPwDHCXH_gEKc3WKD1oPj7GyhHJ2ULngKnLuyMsR5Y/exec';
+let orders = [];
+let subSeq = 0;
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['add','list','budget'][i] === tab));
+  ['add','list','budget'].forEach(p => document.getElementById('panel-'+p).classList.toggle('active', p === tab));
+  if (tab === 'list') renderList();
+  if (tab === 'budget') renderBudget();
+}
+
+async function loadOrders() {
+  const tbody = document.getElementById('orders-tbody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="loading-msg">🔄 불러오는 중...</td></tr>';
+  try {
+    const res = await fetch(API_URL, { method: 'GET' });
+    const raw = await res.json();
+    // raw is array of row objects from sheet
+    orders = raw.map((row, i) => {
+      let items = [];
+      try { items = JSON.parse(row['items'] || '[]'); } catch(e) {}
+      return {
+        id: row['ID'] || (Date.now() + i),
+        no: i + 1,  // 순번 자동 재계산
+        year: row['년도'] || row['year'] || row['Year'] || '',
+        no: row['순번'] || (i+1),
+        teacher: row['담당교사'] || '',
+        subject: row['과목'] || '-',
+        headcount: row['인원수'] || '-',
+        budget: row['예산항목'] || '',
+        storeUrl: row['사이트URL'] || '',
+        memo: row['비고'] || '',
+        items: items,
+        total: Number(row['총액']) || 0,
+        status: row['상태'] || 'pending',
+        date: row['날짜'] || ''
+      };
+    });
+    updateStats();
+    renderList();
+  } catch(e) {
+    document.getElementById('orders-tbody').innerHTML = '<tr><td colspan="8" class="empty-msg">데이터를 불러오지 못했습니다. 새로고침을 눌러주세요.</td></tr>';
+  }
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = orders.length;
+  document.getElementById('stat-pending').textContent = orders.filter(o=>(o.status||'pending')==='pending').length;
+  document.getElementById('stat-ordered').textContent = orders.filter(o=>o.status==='ordered').length;
+  document.getElementById('stat-arrived').textContent = orders.filter(o=>o.status==='arrived').length;
+  document.getElementById('stat-amount').textContent = orders.reduce((s,o)=>s+(o.total||0),0).toLocaleString()+'원';
+}
+
+function populateBudgetFilter() {
+  const sel = document.getElementById('filter-budget');
+  const existing = new Set([...sel.options].map(o=>o.value));
+  [...new Set(orders.map(o=>o.budget).filter(Boolean))].forEach(b => {
+    if (!existing.has(b)) { const opt=document.createElement('option'); opt.value=opt.textContent=b; sel.appendChild(opt); }
+  });
+}
+
+let activeYear = 'all';
+
+function getYears() {
+  const years = [...new Set(orders.map(o => String(o.year||'미설정')).filter(Boolean))].sort();
+  return years;
+}
+
+function renderYearTabs() {
+  const bar = document.getElementById('year-tabs');
+  if (!bar) return;
+  const dataYears = getYears();
+  // 2026~2029 기본 탭 + 데이터 있는 년도 자동 추가
+  const baseYears = ['2026년','2027년','2028년','2029년'];
+  const allYears = [...new Set([...baseYears, ...dataYears])].sort();
+  const allCount = orders.length;
+  let html = `<button class="year-tab-btn ${activeYear==='all'?'active':''}" onclick="setYearTab('all')">전체 <span class="cnt">(${allCount})</span></button>`;
+  allYears.forEach(y => {
+    const cnt = orders.filter(o => String(o.year||'미설정')===y).length;
+    html += `<button class="year-tab-btn ${activeYear===y?'active':''}" onclick="setYearTab('${y}')">${y} <span class="cnt">(${cnt})</span></button>`;
+  });
+  bar.innerHTML = html;
+}
+
+function setYearTab(year) {
+  activeYear = year;
+  renderYearTabs();
+  renderList();
+}
+
+function getFilteredOrders() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const st = document.getElementById('filter-status').value;
+  const bt = document.getElementById('filter-budget').value;
+  return orders.filter(o => {
+    if (activeYear !== 'all' && String(o.year||'미설정') !== activeYear) return false;
+    if (st && (o.status||'pending')!==st) return false;
+    if (bt && o.budget!==bt) return false;
+    if (q) { const hay=[o.teacher,o.subject,o.budget,...(o.items||[]).map(i=>i.name)].join(' ').toLowerCase(); if(!hay.includes(q)) return false; }
+    return true;
+  });
+}
+
+function renderList() {
+  updateStats(); populateBudgetFilter(); renderYearTabs();
+  const list = getFilteredOrders();
+  const tbody = document.getElementById('orders-tbody');
+  if (list.length===0) { tbody.innerHTML='<tr><td colspan="8" class="empty-msg">해당 년도의 신청 내역이 없습니다.</td></tr>'; return; }
+  tbody.innerHTML = list.map(o => {
+    const status = o.status||'pending';
+    const itemsSummary = (o.items||[]).slice(0,3).map(it=>`<li>· ${escHtml(it.name)} ${it.qty}개</li>`).join('');
+    const moreItems = (o.items||[]).length>3 ? `<li style="color:#bbb;">+ ${(o.items||[]).length-3}개 더...</li>` : '';
+    const siteCell = o.storeUrl ? `<a href="${escHtml(o.storeUrl)}" target="_blank" class="store-link">🔗 링크</a>` : '-';
+    const idx = getFilteredOrders().indexOf(o) + 1;
+    return `<tr>
+      <td style="color:#aaa;font-size:12px;">${idx}</td>
+      <td><div class="teacher-name">${escHtml(o.teacher)}</div><div class="subject-name">${escHtml(o.subject||'-')}</div><div style="font-size:11px;color:#bbb;">${o.date||''}</div></td>
+      <td style="font-size:12px;color:#555;">${escHtml(o.budget)}</td>
+      <td><ul class="items-mini">${itemsSummary}${moreItems}</ul></td>
+      <td>${siteCell}</td>
+      <td class="total-amt">${(o.total||0).toLocaleString()}원</td>
+      <td>
+        <select class="status-select" onchange="changeStatus('${o.id}',this.value)">
+          <option value="pending" ${status==='pending'?'selected':''}>처리 대기</option>
+          <option value="ordered" ${status==='ordered'?'selected':''}>주문 완료</option>
+          <option value="arrived" ${status==='arrived'?'selected':''}>도착 완료</option>
+        </select>
+      </td>
+      <td><div class="action-btns">
+        <button class="icon-btn" onclick="viewDetail('${o.id}')">🔍</button>
+        <button class="icon-btn del" onclick="deleteOrder('${o.id}')">×</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function changeStatus(id, status) {
+  const o = orders.find(x => String(x.id) === String(id));
+  if (o) {
+    o.status = status;
+    updateStats();
+    try {
+      await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'updateStatus', id: id, status: status }) });
+    } catch(e) {}
+  }
+}
+
+async function deleteOrder(id) {
+  if (!confirm('이 신청서를 삭제할까요?')) return;
+  try {
+    await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete', id: id }) });
+  } catch(e) {}
+  orders = orders.filter(x => String(x.id) !== String(id));
+  renderList();
+}
+
+function viewDetail(id) {
+  const o = orders.find(x=>String(x.id)===String(id));
+  if (!o) return;
+  document.getElementById('modal-title').textContent = `${o.teacher} (${o.subject||'-'})`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-field"><div class="dl">년도</div><div class="dv">${escHtml(String(o.year||'-'))}</div></div>
+      <div class="detail-field"><div class="dl">담당교사</div><div class="dv">${escHtml(o.teacher)}</div></div>
+      <div class="detail-field"><div class="dl">과목</div><div class="dv">${escHtml(o.subject||'-')}</div></div>
+      <div class="detail-field"><div class="dl">인원수</div><div class="dv">${escHtml(String(o.headcount||'-'))}</div></div>
+      <div class="detail-field"><div class="dl">예산 항목</div><div class="dv">${escHtml(o.budget)}</div></div>
+      <div class="detail-field"><div class="dl">사이트 URL</div><div class="dv">${o.storeUrl?`<a href="${escHtml(o.storeUrl)}" target="_blank" class="store-link">${escHtml(o.storeUrl)}</a>`:'-'}</div></div>
+      <div class="detail-field"><div class="dl">제출일</div><div class="dv">${o.date||'-'}</div></div>
+      ${o.memo?`<div class="detail-field" style="grid-column:1/-1"><div class="dl">비고</div><div class="dv">${escHtml(o.memo)}</div></div>`:''}
+    </div>
+    <table class="detail-table">
+      <thead><tr><th>품명</th><th>규격</th><th>수량</th><th>단가</th><th>배송비</th><th>소계</th></tr></thead>
+      <tbody>${(o.items||[]).map(it=>`<tr><td>${escHtml(it.name)}</td><td>${escHtml(it.spec||'-')}</td><td>${it.qty}</td><td>${it.price.toLocaleString()}원</td><td>${it.ship.toLocaleString()}원</td><td><strong>${(it.qty*it.price+it.ship).toLocaleString()}원</strong></td></tr>`).join('')}</tbody>
+    </table>
+    <div class="detail-total">총 예상금액 <strong>${(o.total||0).toLocaleString()}원</strong></div>
+  `;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(e) { if (e.target===document.getElementById('modal-bg')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modal-bg').classList.remove('open'); }
+
+function renderBudget() {
+  const grid = document.getElementById('budget-grid');
+  const map = {};
+  orders.forEach(o => { if(!map[o.budget]) map[o.budget]={count:0,total:0}; map[o.budget].count++; map[o.budget].total+=o.total||0; });
+  const entries = Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
+  if (entries.length===0) { grid.innerHTML='<p style="color:#bbb;font-size:14px;padding:2rem 0;">신청 내역이 없습니다.</p>'; return; }
+  grid.innerHTML = entries.map(([name,d])=>`
+    <div class="budget-card">
+      <div class="bname">${escHtml(name)}</div>
+      <div class="brow"><span>신청 건수</span><span>${d.count}건</span></div>
+      <div class="brow"><span>총 예상금액</span><span>${d.total.toLocaleString()}원</span></div>
+    </div>`).join('');
+}
+
+function exportCSV() {
+  if (orders.length===0) { alert('내보낼 데이터가 없습니다.'); return; }
+  const rows=[['순번','담당교사','과목','인원수','예산항목','품명','규격','수량','단가','배송비','소계','사이트URL','비고','상태','날짜']];
+  orders.forEach(o => {
+    (o.items||[]).forEach((it,i)=>{
+      rows.push([i===0?o.no:'',i===0?o.teacher:'',i===0?(o.subject||''):'',i===0?(o.headcount||''):'',i===0?o.budget:'',
+        it.name,it.spec||'',it.qty,it.price,it.ship,it.qty*it.price+it.ship,
+        i===0?(o.storeUrl||''):'',i===0?(o.memo||''):'',
+        i===0?{pending:'처리 대기',ordered:'주문 완료',arrived:'도착 완료'}[o.status||'pending']:'',i===0?(o.date||''):'']);
+    });
+  });
+  const csv='\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='물품주문수합_'+new Date().toLocaleDateString('ko-KR').replace(/\./g,'').replace(/ /g,'')+'.csv';
+  a.click();
+}
+
+function clearAll() {
+  if (!confirm('모든 신청 데이터를 삭제할까요? 되돌릴 수 없습니다.')) return;
+  orders=[]; renderList();
+}
+
+// 직접 입력 폼
+function addSubRow(item) {
+  subSeq++;
+  const num=subSeq;
+  const row=document.createElement('div');
+  row.className='sub-item-row'; row.dataset.id=num;
+  const idx=document.querySelectorAll('.sub-item-row').length+1;
+  row.innerHTML=`
+    <div class="sub-item-num">${idx}</div>
+    <input type="text" placeholder="품명" class="sname" oninput="updateSubSummary()" value="${item?escHtml(item.name):''}" />
+    <input type="text" placeholder="규격" class="sspec" value="${item?escHtml(item.spec):''}" />
+    <input type="number" placeholder="1" min="1" class="sqty" oninput="updateSubSummary()" value="${item?item.qty:''}" />
+    <input type="number" placeholder="0" min="0" class="sprice" oninput="updateSubSummary()" value="${item?item.price:''}" />
+    <input type="number" placeholder="0" min="0" class="sship" oninput="updateSubSummary()" value="${item?item.ship:''}" />
+    <button class="del-row-btn" onclick="removeSubRow(${num})">×</button>`;
+  document.getElementById('a-items-container').appendChild(row);
+  updateSubSummary();
+}
+
+function removeSubRow(id) { const r=document.querySelector(`.sub-item-row[data-id='${id}']`); if(r){r.remove();reindexSub();updateSubSummary();} }
+function reindexSub() { document.querySelectorAll('.sub-item-row').forEach((r,i)=>r.querySelector('.sub-item-num').textContent=i+1); }
+function getSubRowData(row) { return {name:row.querySelector('.sname').value.trim(),spec:row.querySelector('.sspec').value.trim(),qty:parseInt(row.querySelector('.sqty').value)||0,price:parseInt(row.querySelector('.sprice').value)||0,ship:parseInt(row.querySelector('.sship').value)||0}; }
+function updateSubSummary() {
+  const rows=document.querySelectorAll('.sub-item-row'); let ship=0,total=0;
+  rows.forEach(r=>{const d=getSubRowData(r);ship+=d.ship;total+=d.qty*d.price+d.ship;});
+  document.getElementById('a-sum-count').textContent=rows.length+'건';
+  document.getElementById('a-sum-ship').textContent=ship.toLocaleString()+'원';
+  document.getElementById('a-sum-total').textContent=total.toLocaleString()+'원';
+}
+
+function resetAddForm() {
+  ['a-teacher','a-subject','a-headcount','a-budget','a-storeUrl','a-memo'].forEach(id=>document.getElementById(id).value='');
+  setCurrentYear();
+  document.getElementById('a-items-container').innerHTML='';
+  subSeq=0; updateSubSummary(); addSubRow();
+}
+
+async function submitAddForm() {
+  const teacher=document.getElementById('a-teacher').value.trim();
+  const budget=document.getElementById('a-budget').value;
+  const storeUrl=document.getElementById('a-storeUrl').value.trim();
+  const rows=document.querySelectorAll('.sub-item-row');
+  const year=document.getElementById('a-year').value;
+  if (!teacher){alert('담당교사를 입력해주세요.');return;}
+  if (!budget){alert('예산 항목을 선택해주세요.');return;}
+  if (!storeUrl){alert('사이트 URL을 입력해주세요.');return;}
+  if (rows.length===0){alert('물품을 1개 이상 추가해주세요.');return;}
+  const items=[]; let valid=true;
+  rows.forEach((row,i)=>{const d=getSubRowData(row);if(!d.name){alert((i+1)+'번 품명을 입력해주세요.');valid=false;}else items.push(d);});
+  if (!valid) return;
+  const total=items.reduce((s,d)=>s+d.qty*d.price+d.ship,0);
+  const order={
+    id:Date.now(), year, teacher,
+    subject:document.getElementById('a-subject').value.trim()||'-',
+    headcount:document.getElementById('a-headcount').value||'-',
+    budget, storeUrl, memo:document.getElementById('a-memo').value.trim()||'',
+    items, total, status:'pending', date:new Date().toLocaleDateString('ko-KR')
+  };
+  const btn=document.getElementById('add-btn');
+  btn.disabled=true; btn.textContent='등록 중...';
+  try {
+    await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(order) });
+    alert('✅ 신청서가 등록되었습니다!');
+    orders.unshift(order);
+    orders.forEach((o, i) => o.no = i + 1);  // 전체 순번 재계산
+    resetAddForm();
+    switchTab('list');
+    renderList();
+  } catch(e) {
+    alert('등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+  } finally {
+    btn.disabled=false; btn.textContent='신청서 등록';
+  }
+}
+
+function setCurrentYear() {
+  const year = new Date().getFullYear();
+  document.getElementById('a-year').value = year + '년';
+}
+
+try { setCurrentYear(); } catch(e) {}
+try { addSubRow(); } catch(e) {}
+loadOrders();
+</script>
+</body>
+</html>
