@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!-- saved from url=(0094)file:///C:/Users/User/Downloads/%ED%99%94%ED%95%99_%EC%A7%88%EB%AC%B8%EB%AA%A9%EB%A1%9D_4.html -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>화학 질문 목록</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background: #f7f7f5; color: #1a1a1a; min-height: 100vh; }
+  .header { background: #fff; border-bottom: 1px solid #e8e8e4; padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .header h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+  .header-sub { font-size: 12px; color: #888; }
+  .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.75rem; }
+  .stat { background: #fff; border: 1px solid #e8e8e4; border-radius: 12px; padding: 1rem 1.25rem; }
+  .stat-n { font-size: 24px; font-weight: 600; color: #1a1a1a; letter-spacing: -0.5px; }
+  .stat-l { font-size: 12px; color: #888; margin-top: 3px; }
+  .month-tabs { display: flex; gap: 0; border-bottom: 1px solid #e8e8e4; margin-bottom: 1.25rem; overflow-x: auto; background: #fff; border-radius: 12px 12px 0 0; padding: 0 1rem; }
+  .mtab { padding: 10px 18px; font-size: 13px; font-weight: 400; color: #888; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color .15s; }
+  .mtab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 600; }
+  .mtab:hover:not(.active) { color: #444; }
+  .filters { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .filters select, .filters input { flex: 1; min-width: 130px; padding: 8px 12px; border: 1px solid #e8e8e4; border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; outline: none; }
+  .filters select:focus, .filters input:focus { border-color: #aaa; }
+  .refresh-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .last-upd { font-size: 12px; color: #aaa; }
+  .refresh-btn { font-size: 12px; padding: 6px 14px; border: 1px solid #e8e8e4; border-radius: 8px; background: #fff; color: #555; cursor: pointer; font-family: inherit; transition: background .15s; }
+  .refresh-btn:hover { background: #f0f0ee; }
+  .sort-btn { font-size: 12px; padding: 6px 14px; border: 1px solid #e8e8e4; border-radius: 8px; background: #fff; color: #555; cursor: pointer; font-family: inherit; transition: background .15s; }
+  .sort-btn:hover { background: #f0f0ee; }
+  .date-group { margin-bottom: 2rem; }
+  .dh { display: flex; align-items: center; gap: 10px; margin-bottom: .875rem; cursor: pointer; user-select: none; }
+  .dl { font-size: 13px; font-weight: 600; color: #555; white-space: nowrap; }
+  .dc { font-size: 12px; color: #aaa; white-space: nowrap; }
+  .dline { flex: 1; height: 1px; background: #e8e8e4; }
+  .di { font-size: 11px; color: #bbb; }
+  .qc { background: #fff; border: 1px solid #e8e8e4; border-radius: 12px; padding: 1.125rem 1.375rem; margin-bottom: .625rem; transition: border-color .15s, opacity .15s; }
+  .qc:hover { border-color: #ccc; }
+  .qc:last-child { margin-bottom: 0; }
+  .qc.done { background: #f7faf7; border-color: #c3e0c3; opacity: 0.75; }
+  .qt { display: flex; align-items: center; gap: 8px; margin-bottom: .625rem; flex-wrap: wrap; }
+  .check-btn { margin-left: auto; font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid #e8e8e4; background: #fff; color: #888; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all .15s; }
+  .check-btn:hover { border-color: #4caf50; color: #4caf50; }
+  .check-btn.done { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; font-weight: 600; }
+  .done-badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: #e8f5e9; color: #2e7d32; font-weight: 600; white-space: nowrap; }
+  .qn { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+  .pill { font-size: 11px; padding: 3px 9px; border-radius: 20px; white-space: nowrap; font-weight: 500; }
+  .pt { background: #eeecfd; color: #4b3fbf; }
+  .ps { background: #f0efe8; color: #5a5850; }
+  .qb { font-size: 13px; color: #333; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+  .more { font-size: 12px; color: #aaa; cursor: pointer; margin-top: 6px; display: inline-block; }
+  .more:hover { color: #666; }
+  .empty { text-align: center; padding: 4rem 0; color: #aaa; font-size: 14px; line-height: 2; }
+  .loading { text-align: center; padding: 4rem 0; color: #aaa; font-size: 14px; }
+  .spinner { width: 24px; height: 24px; border: 2px solid #e8e8e4; border-top-color: #888; border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 1rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>화학 질문 목록</h1>
+  <span class="header-sub" id="last-upd">13시 42분 업데이트</span>
+</div>
+
+<div class="container">
+  <div class="stat-row" id="stats"><div class="stat"><div class="stat-n">23</div><div class="stat-l">전체 질문</div></div><div class="stat"><div class="stat-n">20</div><div class="stat-l">접수 날짜</div></div><div class="stat"><div class="stat-n">3</div><div class="stat-l">담당 선생님</div></div></div>
+
+  <div class="month-tabs" id="month-tabs"><button class="mtab active" onclick="selMonth(&#39;all&#39;)">전체</button><button class="mtab" onclick="selMonth(&#39;2026-03&#39;)">3월</button><button class="mtab" onclick="selMonth(&#39;2026-04&#39;)">4월</button></div>
+
+  <div class="filters">
+    <select id="fteacher" onchange="render()"><option value="">전체 선생님</option><option>김준겸 선생님</option><option>도혜진 선생님</option><option>이수진 선생님</option></select>
+    <select id="fweek" onchange="render()"><option value="">전체 주차</option><option value="1">1주차</option><option value="2">2주차</option><option value="3">3주차</option><option value="4">4주차</option><option value="5">5주차</option></select>
+    <input type="text" id="fsearch" placeholder="이름 · 학번 · 내용 검색" oninput="render()">
+  </div>
+
+  <div class="refresh-row">
+    <span class="last-upd" id="last-upd2">13시 42분 업데이트</span>
+    <div style="display:flex;gap:8px;">
+      <button class="sort-btn" id="sort-btn" onclick="toggleSort()">↑ 오름차순</button>
+      <button class="refresh-btn" onclick="fetchData()">새로고침</button>
+    </div>
+  </div>
+
+  <div id="list"><div class="date-group"><div class="dh" onclick="tog(&#39;2026-03-06&#39;)"><span class="dl">2026년 3월 6일</span><span class="dc">1주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260306" style="display:block"><div class="qc" id="card-202603060"><div class="qt"><span class="qn">전효인</span><span class="pill ps">20227</span><span class="pill pt">김준겸 선생님</span><button class="check-btn" id="chk-202603060" onclick="toggleDone(&#39;202603060&#39;)">답변완료</button></div><div class="qb" id="b202603060">‘아보가드로수’라는 이름의 유래가 궁금합니다.</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-03-09&#39;)"><span class="dl">2026년 3월 9일</span><span class="dc">2주차 · 2건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260309" style="display:block"><div class="qc" id="card-202603090"><div class="qt"><span class="qn">손성룡</span><span class="pill ps">20714</span><span class="pill pt">도혜진 선생님</span><button class="check-btn" id="chk-202603090" onclick="toggleDone(&#39;202603090&#39;)">답변완료</button></div><div class="qb" id="b202603090">몰질량 부분에서 수소는 1g/mol이고 탄소는 12g/mol, 질소는 14g/mol 등등이 있는데 원자 1개의 질량을 측정해서 6.02*10^23을 곱한건지 아니면 다른 방법을 통해서 이 숫자들은 어떻게 수치로 표현했는지 궁금해요.</div></div><div class="qc" id="card-202603091"><div class="qt"><span class="qn" style="color:#aaa;">이름 없음</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202603091" onclick="toggleDone(&#39;202603091&#39;)">답변완료</button></div><div class="qb" id="b202603091">원자량같은 상대적질량이랑 몰질량이랑 머가달라여?</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-03-11&#39;)"><span class="dl">2026년 3월 11일</span><span class="dc">2주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260311" style="display:block"><div class="qc" id="card-202603110"><div class="qt"><span class="qn">류진아</span><span class="pill ps">20113</span><span class="pill pt">김준겸 선생님</span><button class="check-btn" id="chk-202603110" onclick="toggleDone(&#39;202603110&#39;)">답변완료</button></div><div class="qb" id="b202603110">아보가드로 법칙은 같은 온도, 압력에서 기체의 종류와 관계없이 성립하고 그 예로 0도, 1기압에서는 기체 1mol의 부피가 22.4L이잖아요. 온도가 높아지면 입자의 운동 속도가 빨라져서 그 부피가 커지는데 이것은 입자의 빨라지는 속도나 비율이 같아서…</div><span class="more" id="m202603110" onclick="expand(&#39;202603110&#39;)">더 보기</span></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-03-16&#39;)"><span class="dl">2026년 3월 16일</span><span class="dc">3주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260316" style="display:block"><div class="qc" id="card-202603160"><div class="qt"><span class="qn">김지오</span><span class="pill ps">20812</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202603160" onclick="toggleDone(&#39;202603160&#39;)">답변완료</button></div><div class="qb" id="b202603160">35페이지 소단원 마무리에서 탄산수소에 있는 탄산 이온이 불안정하기 때문에 물과 이산화탄소로 분해된다고 하셨는데 탄산칼슘에서는 왜 탄산이온이 무언가로 분해되지 않는지 궁금해요</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-03-18&#39;)"><span class="dl">2026년 3월 18일</span><span class="dc">3주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260318" style="display:block"><div class="qc" id="card-202603180"><div class="qt"><span class="qn">송효진</span><span class="pill ps">20315</span><span class="pill pt">김준겸 선생님</span><button class="check-btn" id="chk-202603180" onclick="toggleDone(&#39;202603180&#39;)">답변완료</button></div><div class="qb" id="b202603180">시험 서술형에 화학 반응식을 나타내라고 하면 상태도 적어야 하는건가요??</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-03-23&#39;)"><span class="dl">2026년 3월 23일</span><span class="dc">4주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260323" style="display:block"><div class="qc" id="card-202603230"><div class="qt"><span class="qn">이지후</span><span class="pill ps">10125</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202603230" onclick="toggleDone(&#39;202603230&#39;)">답변완료</button></div><div class="qb" id="b202603230">교과서 43쪽의 중단원 마무리 문제에서 6번의 ㄴ선지에서부피비가 같은데 물 1리터가 분해되면 왜 수소 1리터가 생성되지 않는건지 궁급합니다.</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-03-25&#39;)"><span class="dl">2026년 3월 25일</span><span class="dc">4주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260325" style="display:block"><div class="qc" id="card-202603250"><div class="qt"><span class="qn" style="color:#aaa;">이름 없음</span><span class="pill pt">김준겸 선생님</span><button class="check-btn" id="chk-202603250" onclick="toggleDone(&#39;202603250&#39;)">답변완료</button></div><div class="qb" id="b202603250">제시문면접 기출문제 004 문제 I-v 에서 (마)과정에서 페놀프탈레인용액이 전체가 붉은색으로 변한 순간의NaOH의 부피를 측정한 값을 V 라고 했는데 이미 페놀프탈레인 용액이 붉은색으로 변하였다면 삼각플라스크 안이 염기성 용액이 된 것이라서 정확한 …</div><span class="more" id="m202603250" onclick="expand(&#39;202603250&#39;)">더 보기</span></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-03-31&#39;)"><span class="dl">2026년 3월 31일</span><span class="dc">5주차 · 2건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260331" style="display:block"><div class="qc" id="card-202603310"><div class="qt"><span class="qn">우소윤</span><span class="pill ps">20518</span><span class="pill pt">김준겸 선생님</span><button class="check-btn" id="chk-202603310" onclick="toggleDone(&#39;202603310&#39;)">답변완료</button></div><div class="qb" id="b202603310">물의 전기분해 실험을 할 때 +극에 산소 기체가 발생하고 -극에는 수소 기체가 발생하는 이유가 뭔가요?</div></div><div class="qc" id="card-202603311"><div class="qt"><span class="qn" style="color:#aaa;">이름 없음</span><span class="pill pt">도혜진 선생님</span><button class="check-btn" id="chk-202603311" onclick="toggleDone(&#39;202603311&#39;)">답변완료</button></div><div class="qb" id="b202603311">전자의 흐름과 전류의 흐름 차이점</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-01&#39;)"><span class="dl">2026년 4월 1일</span><span class="dc">1주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260401" style="display:block"><div class="qc" id="card-202604010"><div class="qt"><span class="qn">이혜원</span><span class="pill ps">20223</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202604010" onclick="toggleDone(&#39;202604010&#39;)">답변완료</button></div><div class="qb" id="b202604010">헬륨 원자도 안정한 원자인데, 왜 수소는 전자를 얻지 않고 잃어서 H+가 되는가?</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-02&#39;)"><span class="dl">2026년 4월 2일</span><span class="dc">1주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260402" style="display:block"><div class="qc" id="card-202604020"><div class="qt"><span class="qn">허태원</span><span class="pill ps">20332</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202604020" onclick="toggleDone(&#39;202604020&#39;)">답변완료</button></div><div class="qb" id="b202604020">전기음성도의 정의는 공유 전자쌍을 끌어당기는 정도인데 공유 전자쌍은 공유 결합에서 나오는 개념이다.금속 원자는 공유 결합을 못하는데 금속은 전기음성도를 어떻게 측정했을까?</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-03&#39;)"><span class="dl">2026년 4월 3일</span><span class="dc">1주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260403" style="display:block"><div class="qc" id="card-202604030"><div class="qt"><span class="qn">김건</span><span class="pill ps">20702</span><span class="pill pt">도혜진 선생님</span><button class="check-btn" id="chk-202604030" onclick="toggleDone(&#39;202604030&#39;)">답변완료</button></div><div class="qb" id="b202604030">극성을 띈다, 쌍극자 모멘트를 가진다?의 차이가 뭔지 햇갈립니다!</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-08&#39;)"><span class="dl">2026년 4월 8일</span><span class="dc">2주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260408" style="display:block"><div class="qc" id="card-202604080"><div class="qt"><span class="qn">이채연</span><span class="pill ps">20321</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202604080" onclick="toggleDone(&#39;202604080&#39;)">답변완료</button></div><div class="qb" id="b202604080">전자 사이에는 전기적 반발력이 작용하므로, 가능한 한 원자 내에서 멀리 떨어진 방향으로 배치됩니다. 그러나 원자핵의 양성자도 양전하를 띠므로 전기적 반발력이 작용할 것입니다. 그렇다면, 원자번호가 2 이상인 원자에서 원자핵의 양성자도 떨어져 분포하는 …</div><span class="more" id="m202604080" onclick="expand(&#39;202604080&#39;)">더 보기</span></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-09&#39;)"><span class="dl">2026년 4월 9일</span><span class="dc">2주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260409" style="display:block"><div class="qc" id="card-202604090"><div class="qt"><span class="qn">이혜윰</span><span class="pill ps">20224</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202604090" onclick="toggleDone(&#39;202604090&#39;)">답변완료</button></div><div class="qb" id="b202604090">원자가 전자와 최외각 전자는 무슨 차이가 있나요? 두 용어를 혼용해서 써도 되는건가요?</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-13&#39;)"><span class="dl">2026년 4월 13일</span><span class="dc">2주차 · 2건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260413" style="display:block"><div class="qc" id="card-202604130"><div class="qt"><span class="qn">유지은</span><span class="pill ps">20214</span><span class="pill pt">김준겸 선생님</span><button class="check-btn" id="chk-202604130" onclick="toggleDone(&#39;202604130&#39;)">답변완료</button></div><div class="qb" id="b202604130">물질의 상태가 다른 화학 반응식에서 질량비는 알 수 없는 건가요? 2Na(s) + cl2(g) -&gt; 2Nacl(s) 에서 몰 비만 알 수 있다고 써서 헷갈려서 질문합니다!</div></div><div class="qc" id="card-202604131"><div class="qt"><span class="qn">기태윤</span><span class="pill ps">20802</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202604131" onclick="toggleDone(&#39;202604131&#39;)">답변완료</button></div><div class="qb" id="b202604131">물줄기에 대전체를 가까이 할때 플러스 대전체,  마이너스 대전체 두 상황 모두다 물줄기가 대전체에 가까워지는지 궁금합니다. 한번은 가까워지고 한번은 멀어지는게 뭔가 직관적인 느낌입니다.</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-14&#39;)"><span class="dl">2026년 4월 14일</span><span class="dc">2주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260414" style="display:block"><div class="qc" id="card-202604140"><div class="qt"><span class="qn">기태윤</span><span class="pill ps">20802</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202604140" onclick="toggleDone(&#39;202604140&#39;)">답변완료</button></div><div class="qb" id="b202604140">분자의 극성이 따른 용해성에서 밀도에 따른 층분리와 극성이 따른 층분라는 어떤 관계로 이해해야 할까요</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-16&#39;)"><span class="dl">2026년 4월 16일</span><span class="dc">3주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260416" style="display:block"><div class="qc" id="card-202604160"><div class="qt"><span class="qn">박지원</span><span class="pill ps">20114</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202604160" onclick="toggleDone(&#39;202604160&#39;)">답변완료</button></div><div class="qb" id="b202604160">교과서 87쪽 7번문제 5번에서 모든원자가 같은 평명인 분자는 가,나 두가지 아닌가요?</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-17&#39;)"><span class="dl">2026년 4월 17일</span><span class="dc">3주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260417" style="display:block"><div class="qc" id="card-202604170"><div class="qt"><span class="qn">이민우</span><span class="pill ps">20218</span><span class="pill pt">김준겸 선생님</span><button class="check-btn" id="chk-202604170" onclick="toggleDone(&#39;202604170&#39;)">답변완료</button></div><div class="qb" id="b202604170">분자의 종류에 상관없이 항상 결합각은 삼각뿔이 굽은형보다 큰가요? 문제에서 삼각뿔인 분자와 굽은형인 분자의 결합각을 비교하라고 하면 무조건 삼각뿔의 결합각이 크다고 생각해도 되는 건가요?</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-18&#39;)"><span class="dl">2026년 4월 18일</span><span class="dc">3주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260418" style="display:block"><div class="qc" id="card-202604180"><div class="qt"><span class="qn">엄지원</span><span class="pill ps">20613</span><span class="pill pt">도혜진 선생님</span><button class="check-btn" id="chk-202604180" onclick="toggleDone(&#39;202604180&#39;)">답변완료</button></div><div class="qb" id="b202604180">2단원 제시문 화67 4-1에서, 결합각의 대소관계를 설명할 때 결합각이 몇 도인지 써야 하나요??</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-20&#39;)"><span class="dl">2026년 4월 20일</span><span class="dc">3주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260420" style="display:block"><div class="qc" id="card-202604200"><div class="qt"><span class="qn">박하윤</span><span class="pill ps">20410</span><span class="pill pt">도혜진 선생님</span><button class="check-btn" id="chk-202604200" onclick="toggleDone(&#39;202604200&#39;)">답변완료</button></div><div class="qb" id="b202604200">추가자료 p.20-21 2페이지 40번(2번째 문제) b구하는 방법을 모르겠습니다</div></div></div></div><div class="date-group"><div class="dh" onclick="tog(&#39;2026-04-29&#39;)"><span class="dl">2026년 4월 29일</span><span class="dc">5주차 · 1건</span><div class="dline"></div><span class="di">▼</span></div><div id="g20260429" style="display:block"><div class="qc" id="card-202604290"><div class="qt"><span class="qn">강수경</span><span class="pill ps">20601</span><span class="pill pt">이수진 선생님</span><button class="check-btn" id="chk-202604290" onclick="toggleDone(&#39;202604290&#39;)">답변완료</button></div><div class="qb" id="b202604290">1) 교과서에서 반응 조건에 따라 정반응과 역반응이 모두 일어날 수 있는 반응을 가역 반응이라고 적혀있는데 여기에서 반응 조건이 무엇을 의미하는 것인가요? 2) 가역 반응에서는 반응물과 생성물의 반응이므로 화학반응과 해당하는 것인가요? 그러면 물이 얼…</div><span class="more" id="m202604290" onclick="expand(&#39;202604290&#39;)">더 보기</span></div></div></div></div>
+</div>
+
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbzC8PbRpvAAytIv7OcwoQCQy5k-A3GB1grMouQqNeRgRJDpfEHiFs_0Agde9nxFsueL7g/exec';
+var allData = [];
+var collapsed = {};
+var selectedMonth = 'all';
+var fullTexts = {};
+var sortAsc = true;
+var completedSet = {};
+
+function loadCompleted() {
+  try { completedSet = JSON.parse(localStorage.getItem('chem_done') || '{}'); } catch(e) { completedSet = {}; }
+}
+function saveCompleted() {
+  try { localStorage.setItem('chem_done', JSON.stringify(completedSet)); } catch(e) {}
+}
+function toggleDone(uid) {
+  completedSet[uid] = !completedSet[uid];
+  saveCompleted();
+  var card = document.getElementById('card-' + uid);
+  var btn = document.getElementById('chk-' + uid);
+  if (completedSet[uid]) {
+    card.classList.add('done');
+    btn.textContent = '✓ 답변완료';
+    btn.classList.add('done');
+  } else {
+    card.classList.remove('done');
+    btn.textContent = '답변완료';
+    btn.classList.remove('done');
+  }
+}
+function toggleSort() {
+  sortAsc = !sortAsc;
+  document.getElementById('sort-btn').textContent = sortAsc ? '↑ 오름차순' : '↓ 내림차순';
+  render();
+}
+
+function fmtDate(d) {
+  var p = d.split('-');
+  return p[0] + '년 ' + parseInt(p[1]) + '월 ' + parseInt(p[2]) + '일';
+}
+function getWeek(ds) { return Math.ceil(new Date(ds).getDate() / 7); }
+function getYM(ds) { return ds.slice(0, 7); }
+function fmtYM(ym) { return parseInt(ym.split('-')[1]) + '월'; }
+
+function fetchData() {
+  document.getElementById('list').innerHTML = '<div class="loading"><div class="spinner"></div>데이터를 불러오는 중...</div>';
+  var cbName = 'cb_' + Date.now();
+  var script = document.createElement('script');
+  var done = false;
+
+  window[cbName] = function(data) {
+    done = true;
+    delete window[cbName];
+    if (document.body.contains(script)) document.body.removeChild(script);
+    allData = data.filter(function(r) { return r.date; });
+    var now = new Date();
+    var timeStr = now.getHours() + '시 ' + String(now.getMinutes()).padStart(2, '0') + '분 업데이트';
+    document.getElementById('last-upd').textContent = timeStr;
+    document.getElementById('last-upd2').textContent = timeStr;
+    selectedMonth = 'all';
+    initAll();
+  };
+
+  script.onerror = function() {
+    if (!done) {
+      document.getElementById('list').innerHTML = '<div class="empty">데이터를 불러오지 못했습니다.<br>새로고침을 눌러 다시 시도해 주세요.</div>';
+      delete window[cbName];
+    }
+  };
+
+  script.src = API + '?callback=' + cbName;
+  document.body.appendChild(script);
+
+  setTimeout(function() {
+    if (!done) {
+      document.getElementById('list').innerHTML = '<div class="empty">응답 시간이 초과되었습니다.<br>새로고침을 눌러 다시 시도해 주세요.</div>';
+      delete window[cbName];
+    }
+  }, 12000);
+}
+
+function initAll() {
+  buildMonthTabs();
+  buildFilters();
+  render();
+}
+
+function buildMonthTabs() {
+  var months = [...new Set(allData.map(function(q) { return getYM(q.date); }))].sort();
+  var all = ['all'].concat(months);
+  document.getElementById('month-tabs').innerHTML = all.map(function(m) {
+    var label = m === 'all' ? '전체' : fmtYM(m);
+    return '<button class="mtab' + (selectedMonth === m ? ' active' : '') + '" onclick="selMonth(\'' + m + '\')">' + label + '</button>';
+  }).join('');
+}
+
+function selMonth(m) {
+  selectedMonth = m;
+  buildMonthTabs();
+  buildFilters();
+  render();
+}
+
+function getBase() {
+  if (selectedMonth === 'all') return allData;
+  return allData.filter(function(q) { return getYM(q.date) === selectedMonth; });
+}
+
+function buildFilters() {
+  var base = getBase();
+  var teachers = [...new Set(base.map(function(q) { return q.teacher; }).filter(Boolean))].sort();
+  var weeks = [...new Set(base.map(function(q) { return getWeek(q.date); }))].sort(function(a, b) { return a - b; });
+  var ft = document.getElementById('fteacher');
+  var curT = ft.value;
+  ft.innerHTML = '<option value="">전체 선생님</option>' + teachers.map(function(t) {
+    return '<option' + (t === curT ? ' selected' : '') + '>' + t + '</option>';
+  }).join('');
+  var fw = document.getElementById('fweek');
+  var curW = fw.value;
+  fw.innerHTML = '<option value="">전체 주차</option>' + weeks.map(function(w) {
+    return '<option value="' + w + '"' + (String(w) === curW ? ' selected' : '') + '>' + w + '주차</option>';
+  }).join('');
+  updateStats(base);
+}
+
+function updateStats(base) {
+  var dates = new Set(base.map(function(q) { return q.date; }));
+  var teachers = new Set(base.map(function(q) { return q.teacher; }).filter(Boolean));
+  document.getElementById('stats').innerHTML =
+    '<div class="stat"><div class="stat-n">' + base.length + '</div><div class="stat-l">전체 질문</div></div>' +
+    '<div class="stat"><div class="stat-n">' + dates.size + '</div><div class="stat-l">접수 날짜</div></div>' +
+    '<div class="stat"><div class="stat-n">' + teachers.size + '</div><div class="stat-l">담당 선생님</div></div>';
+}
+
+function render() {
+  var teacher = document.getElementById('fteacher').value;
+  var week = document.getElementById('fweek').value;
+  var kw = document.getElementById('fsearch').value.trim().toLowerCase();
+  var base = getBase();
+  var filtered = base.filter(function(q) {
+    if (teacher && q.teacher !== teacher) return false;
+    if (week && getWeek(q.date) !== parseInt(week)) return false;
+    if (kw) {
+      var inName = q.name && q.name.toLowerCase().includes(kw);
+      var inSid = q.sid && q.sid.includes(kw);
+      var inQ = q.q && q.q.toLowerCase().includes(kw);
+      if (!inName && !inSid && !inQ) return false;
+    }
+    return true;
+  });
+
+  var groups = Object.entries(filtered.reduce(function(acc, q) {
+    if (!acc[q.date]) acc[q.date] = [];
+    acc[q.date].push(q);
+    return acc;
+  }, {})).sort(function(a, b) { return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]); });
+
+  var list = document.getElementById('list');
+  if (!groups.length) { list.innerHTML = '<div class="empty">해당하는 질문이 없습니다</div>'; return; }
+
+  list.innerHTML = groups.map(function(entry) {
+    var d = entry[0]; var qs = entry[1];
+    var gid = 'g' + d.replace(/-/g, '');
+    var isCol = !!collapsed[d];
+    var wk = getWeek(d);
+    return '<div class="date-group">' +
+      '<div class="dh" onclick="tog(\'' + d + '\')">' +
+        '<span class="dl">' + fmtDate(d) + '</span>' +
+        '<span class="dc">' + wk + '주차 · ' + qs.length + '건</span>' +
+        '<div class="dline"></div>' +
+        '<span class="di">' + (isCol ? '▶' : '▼') + '</span>' +
+      '</div>' +
+      '<div id="' + gid + '" style="display:' + (isCol ? 'none' : 'block') + '">' +
+        qs.map(function(q, i) { return makeCard(q, d.replace(/-/g, '') + i); }).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function makeCard(q, uid) {
+  var short = q.q && q.q.length > 140;
+  var preview = short ? q.q.slice(0, 140) + '…' : (q.q || '');
+  fullTexts[uid] = q.q || '';
+  var isDone = !!completedSet[uid];
+  return '<div class="qc' + (isDone ? ' done' : '') + '" id="card-' + uid + '">' +
+    '<div class="qt">' +
+      (q.name ? '<span class="qn">' + q.name + '</span>' : '<span class="qn" style="color:#aaa;">이름 없음</span>') +
+      (q.sid ? '<span class="pill ps">' + q.sid + '</span>' : '') +
+      (q.teacher ? '<span class="pill pt">' + q.teacher + '</span>' : '') +
+      '<button class="check-btn' + (isDone ? ' done' : '') + '" id="chk-' + uid + '" onclick="toggleDone(\'' + uid + '\')">' + (isDone ? '✓ 답변완료' : '답변완료') + '</button>' +
+    '</div>' +
+    '<div class="qb" id="b' + uid + '">' + preview + '</div>' +
+    (short ? '<span class="more" id="m' + uid + '" onclick="expand(\'' + uid + '\')">더 보기</span>' : '') +
+  '</div>';
+}
+
+function expand(uid) {
+  document.getElementById('b' + uid).textContent = fullTexts[uid] || '';
+  var m = document.getElementById('m' + uid); if (m) m.remove();
+}
+function tog(d) { collapsed[d] = !collapsed[d]; render(); }
+
+loadCompleted();
+fetchData();
+</script>
+
+
+</body></html>
