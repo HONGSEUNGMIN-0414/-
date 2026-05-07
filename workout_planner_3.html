@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>운동 커리큘럼</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #2d6a4f;
+    --green-light: #52b788;
+    --green-pale: #d8f3dc;
+    --amber: #e76f51;
+    --bg: #f8faf8;
+    --card: #ffffff;
+    --text: #1b2e1f;
+    --muted: #6b8c72;
+    --border: #dde8de;
+  }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* 헤더 */
+  .header { background: var(--green); padding: 1.5rem 2rem; }
+  .header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+  .header h1 { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+  .header-sub { font-size: 12px; color: #a8d5b5; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  /* 프로필 카드 */
+  .profile-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; }
+  .profile-item { text-align: center; }
+  .profile-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .profile-value { font-size: 18px; font-weight: 700; color: var(--green); }
+  .profile-unit { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .weight-input-wrap { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; }
+  .weight-input { width: 60px; font-size: 18px; font-weight: 700; color: var(--green); border: none; border-bottom: 2px solid var(--green-pale); background: none; text-align: center; outline: none; font-family: inherit; padding: 2px 0; }
+  .weight-input:focus { border-bottom-color: var(--green); }
+  .weight-unit { font-size: 12px; color: var(--muted); }
+  .weight-save-btn { font-size: 11px; padding: 3px 10px; background: var(--green); color: #fff; border: none; border-radius: 20px; cursor: pointer; font-family: inherit; margin-top: 6px; }
+
+  /* BMI 바 */
+  .bmi-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .bmi-title { font-size: 13px; color: var(--muted); margin-bottom: .75rem; }
+  .bmi-bar-wrap { position: relative; height: 10px; background: linear-gradient(to right, #74c69d, #52b788, #e9c46a, #e76f51, #c1121f); border-radius: 10px; margin-bottom: 8px; }
+  .bmi-marker { position: absolute; top: -4px; width: 18px; height: 18px; background: #fff; border: 3px solid var(--green); border-radius: 50%; transform: translateX(-50%); }
+  .bmi-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+  .bmi-value-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .bmi-num { font-size: 24px; font-weight: 700; color: var(--green); }
+  .bmi-tag { font-size: 12px; padding: 3px 10px; border-radius: 20px; background: var(--green-pale); color: var(--green); font-weight: 500; }
+  .bmi-desc { font-size: 12px; color: var(--muted); }
+
+  /* 섹션 타이틀 */
+  .section-title { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 1rem; text-transform: uppercase; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .tab { padding: 7px 16px; font-size: 13px; border: 1px solid var(--border); border-radius: 20px; background: var(--card); color: var(--muted); cursor: pointer; font-family: inherit; transition: all .15s; }
+  .tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+  /* 운동 카드 그리드 */
+  .workout-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .workout-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
+  .workout-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .workout-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .workout-name { font-size: 15px; font-weight: 700; color: var(--text); }
+  .workout-type { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .workout-detail { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: .875rem; }
+  .detail-pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--green-pale); color: var(--green); font-weight: 500; }
+  .detail-pill.amber { background: #fdebd0; color: #c0632a; }
+  .workout-desc { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .workout-tip { font-size: 11px; color: var(--amber); margin-top: 8px; padding: 6px 10px; background: #fdf3ee; border-radius: 8px; line-height: 1.6; }
+
+  /* 주간 스케줄 */
+  .schedule-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .schedule-row { display: flex; align-items: center; gap: 12px; padding: .625rem 0; border-bottom: 1px solid var(--border); }
+  .schedule-row:last-child { border-bottom: none; }
+  .schedule-day { font-size: 13px; font-weight: 700; color: var(--green); width: 32px; flex-shrink: 0; }
+  .schedule-items { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .schedule-pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--green-pale); color: var(--green); }
+  .schedule-pill.rest { background: #f0f0f0; color: #aaa; }
+  .schedule-pill.cardio { background: #fdebd0; color: #c0632a; }
+  .schedule-kcal { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  /* 팁 섹션 */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .tip-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.125rem; }
+  .tip-icon { font-size: 20px; margin-bottom: 6px; }
+  .tip-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .tip-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* 목표/장소 선택 */
+  .selector-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .selector-label { font-size: 12px; color: var(--muted); margin-bottom: .625rem; font-weight: 500; }
+  .selector-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .selector-row:last-child { margin-bottom: 0; }
+  .sel-btn { flex: 1; min-width: 80px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .15s; text-align: center; }
+  .sel-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+  .sel-btn:hover:not(.active) { border-color: var(--green-light); color: var(--green); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>🏃 운동 커리큘럼</h1>
+    <span class="header-sub" id="header-sub">체중감량 · 야외</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 목표 & 장소 선택 -->
+  <div class="selector-section">
+    <div class="selector-label">운동 목표</div>
+    <div class="selector-row">
+      <button class="sel-btn active" id="goal-loss" onclick="selectGoal('loss', this)">🔥 체중감량</button>
+      <button class="sel-btn" id="goal-muscle" onclick="selectGoal('muscle', this)">💪 근육 키우기</button>
+      <button class="sel-btn" id="goal-health" onclick="selectGoal('health', this)">🌿 건강 유지</button>
+    </div>
+    <div class="selector-label">운동 장소</div>
+    <div class="selector-row">
+      <button class="sel-btn active" id="place-outdoor" onclick="selectPlace('outdoor', this)">🏞️ 야외</button>
+      <button class="sel-btn" id="place-gym" onclick="selectPlace('gym', this)">🏋️ 헬스장</button>
+      <button class="sel-btn" id="place-home" onclick="selectPlace('home', this)">🏠 홈트</button>
+      <button class="sel-btn" id="place-etc" onclick="selectPlace('etc', this)">✨ 기타</button>
+    </div>
+  </div>
+
+  <!-- 프로필 -->
+  <div class="profile-card">
+    <div class="profile-item">
+      <div class="profile-label">키</div>
+      <div class="weight-input-wrap">
+        <input type="number" class="weight-input" id="height-input" value="172" min="100" max="220" step="0.1" oninput="updateAll()" />
+        <span class="weight-unit">cm</span>
+      </div>
+      <div style="text-align:center;"><button class="weight-save-btn" onclick="saveHeight()">저장</button></div>
+    </div>
+    <div class="profile-item">
+      <div class="profile-label">몸무게</div>
+      <div class="weight-input-wrap">
+        <input type="number" class="weight-input" id="weight-input" value="78" min="30" max="200" step="0.1" oninput="updateAll()" />
+        <span class="weight-unit">kg</span>
+      </div>
+      <div style="text-align:center;"><button class="weight-save-btn" onclick="saveWeight()">저장</button></div>
+    </div>
+    <div class="profile-item">
+      <div class="profile-label">목표</div>
+      <div class="profile-value" id="profile-goal" style="font-size:13px;">체중감량</div>
+      <div class="profile-unit" id="profile-place">야외 운동</div>
+    </div>
+    <div class="profile-item">
+      <div class="profile-label">목표 체중</div>
+      <div class="profile-value" id="target-weight">70</div>
+      <div class="profile-unit">kg 권장</div>
+    </div>
+    <div class="profile-item">
+      <div class="profile-label" id="diff-label">감량 필요</div>
+      <div class="profile-value" id="need-loss">8</div>
+      <div class="profile-unit">kg</div>
+    </div>
+  </div>
+
+  <!-- BMI -->
+  <div class="bmi-section">
+    <div class="bmi-title">BMI 지수</div>
+    <div class="bmi-bar-wrap">
+      <div class="bmi-marker" id="bmi-marker" style="left: 54%"></div>
+    </div>
+    <div class="bmi-labels">
+      <span>저체중 &lt;18.5</span>
+      <span>정상 18.5~23</span>
+      <span>과체중 23~25</span>
+      <span>비만 &gt;25</span>
+    </div>
+    <div class="bmi-value-row">
+      <div class="bmi-num" id="bmi-num">26.4</div>
+      <div class="bmi-tag" id="bmi-tag">비만 1단계</div>
+      <div class="bmi-desc" id="bmi-desc">정상 범위까지 약 8kg 감량 권장</div>
+    </div>
+  </div>
+
+  <!-- 4주 플랜 탭 -->
+  <div class="section-title" id="plan-title">4주 운동 플랜 — 체중감량 · 야외</div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchWeek(1, this)">1주차</button>
+    <button class="tab" onclick="switchWeek(2, this)">2주차</button>
+    <button class="tab" onclick="switchWeek(3, this)">3주차</button>
+    <button class="tab" onclick="switchWeek(4, this)">4주차</button>
+  </div>
+  <div class="schedule-wrap" id="week-schedule"></div>
+
+  <!-- 운동 탭 -->
+  <div class="section-title" style="margin-top:1.5rem;">운동 동작 가이드</div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('all', this)">전체</button>
+    <button class="tab" onclick="switchTab('cardio', this)">유산소</button>
+    <button class="tab" onclick="switchTab('strength', this)">근력</button>
+    <button class="tab" onclick="switchTab('stretch', this)">스트레칭</button>
+  </div>
+  <div class="workout-grid" id="workout-grid"></div>
+
+  <!-- 팁 -->
+  <div class="section-title">체중감량 핵심 팁</div>
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-icon">🍽️</div>
+      <div class="tip-title">식단 관리</div>
+      <div class="tip-desc">운동만으로는 한계가 있어요. 하루 500kcal 식단 조절이 운동보다 효과적입니다.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">💧</div>
+      <div class="tip-title">수분 섭취</div>
+      <div class="tip-desc">하루 물 2L 이상 마시면 식욕 억제와 지방 대사에 도움이 됩니다.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">😴</div>
+      <div class="tip-title">수면</div>
+      <div class="tip-desc">7시간 이상 수면은 코르티솔 조절로 체중 감량에 필수입니다.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">📈</div>
+      <div class="tip-title">점진적 강도</div>
+      <div class="tip-desc">매주 운동 시간을 5~10분씩 늘려가면 정체기 없이 꾸준히 감량할 수 있어요.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var WORKOUTS = [
+  { id: 'walk', type: 'cardio', icon: '🚶', name: '파워 워킹', sub: '유산소 · 입문', pills: ['30~60분', '100~200kcal/30min'], pillTypes: ['', 'amber'], desc: '빠른 걸음으로 공원이나 트랙을 걷습니다. 무릎 부담이 적고 지방 연소에 효과적입니다.', tip: '팔을 90도로 굽혀 크게 흔들면 칼로리 소모가 20% 증가해요!' },
+  { id: 'jog', type: 'cardio', icon: '🏃', name: '조깅', sub: '유산소 · 중급', pills: ['20~40분', '250~350kcal/30min'], pillTypes: ['', 'amber'], desc: '대화 가능한 속도로 천천히 달립니다. 체중 감량에 가장 효과적인 야외 운동입니다.', tip: '5분 걷기 → 20분 조깅 → 5분 걷기 순서로 시작하세요.' },
+  { id: 'interval', type: 'cardio', icon: '⚡', name: '인터벌 런닝', sub: '유산소 · 고강도', pills: ['20분', '400~500kcal/20min'], pillTypes: ['', 'amber'], desc: '1분 전력질주 + 2분 걷기를 6~8회 반복합니다. 짧은 시간에 최대 칼로리 소모가 가능합니다.', tip: '주 1~2회만 해도 충분해요. 과하면 부상 위험이 있어요.' },
+  { id: 'squat', type: 'strength', icon: '🦵', name: '맨몸 스쿼트', sub: '근력 · 하체', pills: ['3세트 × 15회', ''], pillTypes: ['', ''], desc: '발을 어깨 너비로 벌리고 앉았다 일어납니다. 하체 근육 강화로 기초 대사량을 높입니다.', tip: '무릎이 발끝을 넘지 않도록 주의하세요.' },
+  { id: 'pushup', type: 'strength', icon: '💪', name: '푸시업', sub: '근력 · 상체', pills: ['3세트 × 10~15회', ''], pillTypes: ['', ''], desc: '야외 벤치나 바닥에서 실시합니다. 가슴, 어깨, 삼두근을 동시에 강화합니다.', tip: '무릎 푸시업으로 시작해서 점차 정자세로 발전시키세요.' },
+  { id: 'plank', type: 'strength', icon: '🏋️', name: '플랭크', sub: '근력 · 코어', pills: ['30초 × 3세트', ''], pillTypes: ['', ''], desc: '팔꿈치로 지지하며 몸을 일직선으로 유지합니다. 코어 강화로 자세 교정과 허리 건강에 좋습니다.', tip: '30초가 힘들면 10초씩 나눠서 시작해도 괜찮아요.' },
+  { id: 'lunge', type: 'strength', icon: '🦿', name: '런지', sub: '근력 · 하체', pills: ['3세트 × 12회', ''], pillTypes: ['', ''], desc: '한 발을 앞으로 내딛어 무릎을 90도로 구부립니다. 스쿼트보다 균형감각과 엉덩이 근육 강화에 효과적입니다.', tip: '워킹 런지로 공원을 걸으면 유산소와 근력 동시에!' },
+  { id: 'stretch', type: 'stretch', icon: '🧘', name: '전신 스트레칭', sub: '유연성 · 회복', pills: ['10~15분', ''], pillTypes: ['', ''], desc: '운동 전후 필수입니다. 햄스트링, 고관절, 어깨 위주로 스트레칭합니다.', tip: '운동 후 5분 스트레칭만 해도 근육통이 크게 줄어요.' },
+];
+
+var currentTab = 'all';
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderWorkouts();
+}
+
+function renderWorkouts() {
+  var filtered = currentTab === 'all' ? WORKOUTS : WORKOUTS.filter(function(w) { return w.type === currentTab; });
+  var grid = document.getElementById('workout-grid');
+  grid.innerHTML = filtered.map(function(w) {
+    var pills = w.pills.filter(Boolean).map(function(p, i) {
+      return '<span class="detail-pill' + (w.pillTypes[i] === 'amber' ? ' amber' : '') + '">' + p + '</span>';
+    }).join('');
+    return '<div class="workout-card">' +
+      '<div class="workout-card-header">' +
+        '<div class="workout-icon">' + w.icon + '</div>' +
+        '<div><div class="workout-name">' + w.name + '</div><div class="workout-type">' + w.sub + '</div></div>' +
+      '</div>' +
+      '<div class="workout-detail">' + pills + '</div>' +
+      '<div class="workout-desc">' + w.desc + '</div>' +
+      '<div class="workout-tip">💡 ' + w.tip + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+var currentGoal = 'loss';
+var currentPlace = 'outdoor';
+var currentWeek = 1;
+
+var GOAL_LABELS = {loss:'체중감량', muscle:'근육 키우기', health:'건강 유지'};
+var PLACE_LABELS = {outdoor:'야외', gym:'헬스장', home:'홈트', etc:'기타'};
+
+function selectGoal(goal, btn) {
+  currentGoal = goal;
+  document.querySelectorAll('[id^="goal-"]').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  updateLabels(); renderWeek();
+  localStorage.setItem('workout_goal', goal);
+}
+function selectPlace(place, btn) {
+  currentPlace = place;
+  document.querySelectorAll('[id^="place-"]').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  updateLabels(); renderWeek();
+  localStorage.setItem('workout_place', place);
+}
+function updateLabels() {
+  var gl = GOAL_LABELS[currentGoal], pl = PLACE_LABELS[currentPlace];
+  document.getElementById('header-sub').textContent = gl + ' · ' + pl;
+  document.getElementById('profile-goal').textContent = gl;
+  document.getElementById('profile-place').textContent = pl + ' 운동';
+  document.getElementById('plan-title').textContent = '4주 운동 플랜 — ' + gl + ' · ' + pl;
+}
+
+var P = {
+  loss:{
+    outdoor:[
+      {label:'1주차 — 몸 깨우기',desc:'무리 없이 몸을 움직이는 데 집중합니다.',days:[
+        {day:'Day 1',items:[{t:'파워 워킹 20분',c:'cardio'},{t:'스트레칭 10분',c:''}],k:'약 150 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'파워 워킹 25분',c:'cardio'},{t:'스쿼트 10개 × 2세트',c:''}],k:'약 180 kcal'},
+        {day:'Day 4',items:[{t:'휴식 or 산책',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'파워 워킹 30분',c:'cardio'},{t:'런지 10개 × 2세트',c:''}],k:'약 200 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'산책 30분',c:'cardio'}],k:'약 120 kcal'},
+      ]},
+      {label:'2주차 — 지속성 키우기',desc:'운동 시간을 조금씩 늘립니다.',days:[
+        {day:'Day 1',items:[{t:'파워 워킹 30분',c:'cardio'},{t:'스쿼트 15개 × 2세트',c:''}],k:'약 250 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'파워 워킹 30분',c:'cardio'},{t:'푸시업 8개 × 2세트',c:''},{t:'플랭크 30초 × 2세트',c:''}],k:'약 280 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'조깅 10분 + 걷기 20분',c:'cardio'},{t:'런지 12개 × 2세트',c:''}],k:'약 300 kcal'},
+        {day:'Day 6',items:[{t:'파워 워킹 35분',c:'cardio'}],k:'약 220 kcal'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'3주차 — 강도 올리기',desc:'조깅 비중을 늘리고 근력 세트를 추가합니다.',days:[
+        {day:'Day 1',items:[{t:'조깅 20분',c:'cardio'},{t:'스쿼트 15개 × 3세트',c:''}],k:'약 350 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'조깅 25분',c:'cardio'},{t:'푸시업 10개 × 3세트',c:''},{t:'플랭크 40초 × 3세트',c:''}],k:'약 400 kcal'},
+        {day:'Day 4',items:[{t:'파워 워킹 30분',c:'cardio'}],k:'약 200 kcal'},
+        {day:'Day 5',items:[{t:'조깅 25분',c:'cardio'},{t:'런지 15개 × 3세트',c:''}],k:'약 420 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'조깅 or 산책 30분',c:'cardio'}],k:'약 220 kcal'},
+      ]},
+      {label:'4주차 — 습관 완성',desc:'이 루틴을 꾸준히 유지하세요!',days:[
+        {day:'Day 1',items:[{t:'조깅 30분',c:'cardio'},{t:'스쿼트 20개 × 3세트',c:''}],k:'약 450 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'조깅 30분',c:'cardio'},{t:'푸시업 12개 × 3세트',c:''},{t:'런지 15개 × 3세트',c:''}],k:'약 480 kcal'},
+        {day:'Day 4',items:[{t:'파워 워킹 40분',c:'cardio'}],k:'약 260 kcal'},
+        {day:'Day 5',items:[{t:'조깅 35분',c:'cardio'},{t:'전신 맨몸 운동 15분',c:''}],k:'약 500 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'등산 or 조깅 40분',c:'cardio'}],k:'약 400 kcal'},
+      ]},
+    ],
+    gym:[
+      {label:'1주차 — 기구 적응',desc:'기구에 익숙해지는 데 집중합니다.',days:[
+        {day:'Day 1',items:[{t:'트레드밀 워킹 20분',c:'cardio'},{t:'레그프레스 10개 × 2세트',c:''}],k:'약 200 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'트레드밀 20분',c:'cardio'},{t:'체스트프레스 10개 × 2세트',c:''}],k:'약 220 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'일립티컬 25분',c:'cardio'},{t:'랫풀다운 10개 × 2세트',c:''}],k:'약 250 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'트레드밀 30분',c:'cardio'}],k:'약 200 kcal'},
+      ]},
+      {label:'2주차 — 유산소+근력 균형',desc:'유산소와 근력을 함께 합니다.',days:[
+        {day:'Day 1',items:[{t:'트레드밀 조깅 25분',c:'cardio'},{t:'레그프레스 12개 × 3세트',c:''}],k:'약 300 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'사이클 25분',c:'cardio'},{t:'체스트프레스 12개 × 3세트',c:''},{t:'케이블로우 12개 × 3세트',c:''}],k:'약 350 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'트레드밀 조깅 20분',c:'cardio'},{t:'스쿼트머신 15개 × 3세트',c:''}],k:'약 320 kcal'},
+        {day:'Day 6',items:[{t:'일립티컬 30분',c:'cardio'}],k:'약 250 kcal'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'3주차 — 강도 상승',desc:'유산소와 근력 강도를 동시에 올립니다.',days:[
+        {day:'Day 1',items:[{t:'트레드밀 조깅 30분',c:'cardio'},{t:'하체 머신 30분',c:''}],k:'약 450 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'사이클 30분',c:'cardio'},{t:'상체 머신 30분',c:''}],k:'약 430 kcal'},
+        {day:'Day 4',items:[{t:'트레드밀 30분',c:'cardio'}],k:'약 250 kcal'},
+        {day:'Day 5',items:[{t:'전신 서킷 트레이닝 40분',c:'cardio'}],k:'약 500 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'가벼운 유산소 20분',c:'cardio'}],k:'약 180 kcal'},
+      ]},
+      {label:'4주차 — 습관 완성',desc:'유산소+근력 조합이 자연스러워질 거예요.',days:[
+        {day:'Day 1',items:[{t:'트레드밀 35분',c:'cardio'},{t:'하체 머신 30분',c:''}],k:'약 500 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'사이클 30분',c:'cardio'},{t:'상체 머신 30분',c:''}],k:'약 490 kcal'},
+        {day:'Day 4',items:[{t:'트레드밀 35분',c:'cardio'}],k:'약 280 kcal'},
+        {day:'Day 5',items:[{t:'전신 서킷 트레이닝 45분',c:'cardio'}],k:'약 550 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'가벼운 유산소 + 스트레칭',c:'cardio'}],k:'약 200 kcal'},
+      ]},
+    ],
+    home:[
+      {label:'1주차 — 몸 깨우기',desc:'집에서 도구 없이 시작합니다.',days:[
+        {day:'Day 1',items:[{t:'제자리 걷기 15분',c:'cardio'},{t:'스쿼트 10개 × 2세트',c:''}],k:'약 130 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'제자리 걷기 20분',c:'cardio'},{t:'푸시업(무릎) 8개 × 2세트',c:''}],k:'약 150 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'홈트 영상 20분',c:'cardio'},{t:'플랭크 20초 × 2세트',c:''}],k:'약 160 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'전신 스트레칭 15분',c:''}],k:'회복'},
+      ]},
+      {label:'2주차 — 강도 올리기',desc:'세트 수와 시간을 늘립니다.',days:[
+        {day:'Day 1',items:[{t:'제자리 뛰기 10분',c:'cardio'},{t:'스쿼트 15개 × 3세트',c:''}],k:'약 220 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'홈트 영상 25분',c:'cardio'},{t:'플랭크 30초 × 3세트',c:''}],k:'약 250 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'버피 10개 × 3세트',c:'cardio'},{t:'런지 12개 × 3세트',c:''}],k:'약 300 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'3주차 — 서킷 트레이닝',desc:'동작을 연속으로 이어 칼로리 소모를 높입니다.',days:[
+        {day:'Day 1',items:[{t:'서킷(스쿼트+푸시업+런지) 3라운드',c:'cardio'}],k:'약 350 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'홈트 영상 30분',c:'cardio'},{t:'플랭크 45초 × 3세트',c:''}],k:'약 380 kcal'},
+        {day:'Day 4',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 5',items:[{t:'버피+마운틴클라이머 20분',c:'cardio'},{t:'스쿼트 20개 × 3세트',c:''}],k:'약 420 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'가벼운 홈트 20분',c:'cardio'}],k:'약 180 kcal'},
+      ]},
+      {label:'4주차 — 습관 완성',desc:'이 루틴을 유지하세요!',days:[
+        {day:'Day 1',items:[{t:'서킷 트레이닝 4라운드',c:'cardio'}],k:'약 450 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'홈트 영상 35분',c:'cardio'},{t:'플랭크 60초 × 3세트',c:''}],k:'약 480 kcal'},
+        {day:'Day 4',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 5',items:[{t:'전신 서킷 40분',c:'cardio'}],k:'약 500 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭 + 휴식',c:''}],k:'회복'},
+      ]},
+    ],
+    etc:[
+      {label:'1주차 — 시작',desc:'어떤 환경이든 꾸준히 움직이는 것이 핵심입니다.',days:[
+        {day:'Day 1',items:[{t:'30분 걷기 or 활동',c:'cardio'}],k:'약 150 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'30분 활동 + 스쿼트 10개 × 2세트',c:'cardio'}],k:'약 180 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'40분 걷기 or 자전거',c:'cardio'}],k:'약 200 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭 15분',c:''}],k:'회복'},
+      ]},
+      {label:'2주차 — 활동량 늘리기',desc:'일상 속 움직임을 의식적으로 늘립니다.',days:[
+        {day:'Day 1',items:[{t:'40분 걷기',c:'cardio'},{t:'스쿼트+런지 각 15개 × 2세트',c:''}],k:'약 280 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'45분 활동',c:'cardio'},{t:'푸시업 10개 × 2세트',c:''}],k:'약 300 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'50분 유산소',c:'cardio'}],k:'약 320 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'3주차 — 루틴 만들기',desc:'규칙적인 운동 시간을 정해보세요.',days:[
+        {day:'Day 1',items:[{t:'유산소 50분',c:'cardio'},{t:'근력 운동 20분',c:''}],k:'약 400 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'유산소 50분',c:'cardio'},{t:'코어 운동 15분',c:''}],k:'약 400 kcal'},
+        {day:'Day 4',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 5',items:[{t:'전신 운동 60분',c:'cardio'}],k:'약 450 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'가벼운 활동 30분',c:'cardio'}],k:'약 180 kcal'},
+      ]},
+      {label:'4주차 — 습관 완성',desc:'한 달 루틴이 몸에 배었을 거예요!',days:[
+        {day:'Day 1',items:[{t:'유산소 60분',c:'cardio'},{t:'근력 25분',c:''}],k:'약 500 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'유산소+근력 각 30분',c:'cardio'}],k:'약 500 kcal'},
+        {day:'Day 4',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 5',items:[{t:'전신 운동 70분',c:'cardio'}],k:'약 550 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'활동 + 스트레칭',c:''}],k:'약 150 kcal'},
+      ]},
+    ],
+  },
+  muscle:{
+    outdoor:[
+      {label:'1주차 — 맨몸 기초',desc:'야외 맨몸 운동으로 기초 근력을 만듭니다.',days:[
+        {day:'Day 1',items:[{t:'스쿼트 12개 × 3세트',c:''},{t:'푸시업 8개 × 3세트',c:''}],k:'약 250 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'런지 15개 × 3세트',c:''},{t:'딥스(벤치) 8개 × 3세트',c:''},{t:'플랭크 30초 × 3세트',c:''}],k:'약 280 kcal'},
+        {day:'Day 4',items:[{t:'산책 20분',c:'cardio'}],k:'약 100 kcal'},
+        {day:'Day 5',items:[{t:'스쿼트+푸시업+런지 각 15개 × 3세트',c:''}],k:'약 300 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭 15분',c:''}],k:'회복'},
+      ]},
+      {label:'2주차 — 볼륨 증가',desc:'세트 수와 반복 횟수를 늘립니다.',days:[
+        {day:'Day 1',items:[{t:'스쿼트 15개 × 4세트',c:''},{t:'푸시업 12개 × 4세트',c:''}],k:'약 320 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'런지 15개 × 4세트',c:''},{t:'딥스 10개 × 4세트',c:''},{t:'플랭크 40초 × 3세트',c:''}],k:'약 350 kcal'},
+        {day:'Day 4',items:[{t:'조깅 20분',c:'cardio'}],k:'약 180 kcal'},
+        {day:'Day 5',items:[{t:'전신 맨몸 운동 40분',c:''}],k:'약 380 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭',c:''}],k:'회복'},
+      ]},
+      {label:'3주차 — 고강도',desc:'난이도 높은 동작을 추가합니다.',days:[
+        {day:'Day 1',items:[{t:'점프 스쿼트 12개 × 3세트',c:''},{t:'클랩 푸시업 8개 × 3세트',c:''}],k:'약 400 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'불가리안 스플릿 스쿼트 10개 × 3세트',c:''},{t:'딥스 12개 × 4세트',c:''}],k:'약 420 kcal'},
+        {day:'Day 4',items:[{t:'조깅 25분',c:'cardio'}],k:'약 220 kcal'},
+        {day:'Day 5',items:[{t:'전신 근력 서킷 4라운드',c:''}],k:'약 450 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭',c:''}],k:'회복'},
+      ]},
+      {label:'4주차 — 완성',desc:'근력과 지구력이 모두 향상됐어요!',days:[
+        {day:'Day 1',items:[{t:'하체 집중 맨몸 운동 40분',c:''}],k:'약 450 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'상체 집중 맨몸 운동 40분',c:''}],k:'약 430 kcal'},
+        {day:'Day 4',items:[{t:'조깅 30분',c:'cardio'}],k:'약 260 kcal'},
+        {day:'Day 5',items:[{t:'전신 맨몸 서킷 5라운드',c:''}],k:'약 500 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'조깅 + 스트레칭',c:'cardio'}],k:'약 200 kcal'},
+      ]},
+    ],
+    gym:[
+      {label:'1주차 — 기초 중량 적응',desc:'각 기구의 적정 중량을 찾습니다.',days:[
+        {day:'Day 1',items:[{t:'벤치프레스 10개 × 3세트',c:''},{t:'숄더프레스 10개 × 3세트',c:''}],k:'약 280 kcal'},
+        {day:'Day 2',items:[{t:'스쿼트 10개 × 3세트',c:''},{t:'레그프레스 12개 × 3세트',c:''}],k:'약 300 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'데드리프트 8개 × 3세트',c:''},{t:'랫풀다운 12개 × 3세트',c:''}],k:'약 320 kcal'},
+        {day:'Day 5',items:[{t:'케이블 운동 40분',c:''}],k:'약 280 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'유산소 + 스트레칭 30분',c:'cardio'}],k:'약 200 kcal'},
+      ]},
+      {label:'2주차 — 분할 운동',desc:'상체/하체를 분리해서 집중 훈련합니다.',days:[
+        {day:'Day 1',items:[{t:'가슴 — 벤치프레스, 인클라인프레스, 플라이',c:''}],k:'약 350 kcal'},
+        {day:'Day 2',items:[{t:'등 — 데드리프트, 랫풀다운, 시티드로우',c:''}],k:'약 380 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'하체 — 스쿼트, 레그프레스, 레그컬',c:''}],k:'약 400 kcal'},
+        {day:'Day 5',items:[{t:'어깨+팔 — 숄더프레스, 사이드레터럴, 컬',c:''}],k:'약 320 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'트레드밀 20분 + 스트레칭',c:'cardio'}],k:'약 180 kcal'},
+      ]},
+      {label:'3주차 — 중량 증가',desc:'각 운동 중량을 5~10% 올립니다.',days:[
+        {day:'Day 1',items:[{t:'가슴+삼두 집중',c:''}],k:'약 400 kcal'},
+        {day:'Day 2',items:[{t:'등+이두 집중',c:''}],k:'약 420 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'하체+코어 집중',c:''}],k:'약 450 kcal'},
+        {day:'Day 5',items:[{t:'어깨+전신 마무리',c:''}],k:'약 380 kcal'},
+        {day:'Day 6',items:[{t:'유산소 30분',c:'cardio'}],k:'약 250 kcal'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'4주차 — 고강도 완성',desc:'한 달간의 성장을 느껴보세요!',days:[
+        {day:'Day 1',items:[{t:'가슴+삼두 고중량',c:''}],k:'약 450 kcal'},
+        {day:'Day 2',items:[{t:'등+이두 고중량',c:''}],k:'약 460 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'하체 고중량',c:''}],k:'약 500 kcal'},
+        {day:'Day 5',items:[{t:'어깨+코어 집중',c:''}],k:'약 400 kcal'},
+        {day:'Day 6',items:[{t:'전신 펌핑 + 마무리',c:''}],k:'약 420 kcal'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+    ],
+    home:[
+      {label:'1주차 — 맨몸 기초',desc:'집에서 근력 기초를 만듭니다.',days:[
+        {day:'Day 1',items:[{t:'푸시업 10개 × 3세트',c:''},{t:'스쿼트 15개 × 3세트',c:''}],k:'약 220 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'런지 12개 × 3세트',c:''},{t:'플랭크 30초 × 3세트',c:''}],k:'약 240 kcal'},
+        {day:'Day 4',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 5',items:[{t:'전신 맨몸 운동 30분',c:''}],k:'약 280 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭 15분',c:''}],k:'회복'},
+      ]},
+      {label:'2주차 — 볼륨 업',desc:'세트와 횟수를 늘립니다.',days:[
+        {day:'Day 1',items:[{t:'푸시업 15개 × 4세트',c:''},{t:'딥스(의자) 10개 × 3세트',c:''}],k:'약 300 kcal'},
+        {day:'Day 2',items:[{t:'스쿼트 20개 × 4세트',c:''},{t:'런지 15개 × 4세트',c:''}],k:'약 320 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'플랭크 45초 × 4세트',c:''},{t:'버피 10개 × 3세트',c:''}],k:'약 350 kcal'},
+        {day:'Day 5',items:[{t:'전신 맨몸 서킷 3라운드',c:''}],k:'약 380 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭',c:''}],k:'회복'},
+      ]},
+      {label:'3주차 — 고강도',desc:'점프 동작과 고강도 서킷을 추가합니다.',days:[
+        {day:'Day 1',items:[{t:'클랩 푸시업 8개 × 3세트',c:''},{t:'점프 스쿼트 12개 × 3세트',c:''}],k:'약 400 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'불가리안 스쿼트 10개 × 3세트',c:''},{t:'마운틴클라이머 20개 × 3세트',c:''}],k:'약 420 kcal'},
+        {day:'Day 4',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 5',items:[{t:'전신 HIIT 30분',c:'cardio'}],k:'약 450 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'가벼운 운동+스트레칭',c:''}],k:'약 180 kcal'},
+      ]},
+      {label:'4주차 — 완성',desc:'한 달 홈트로 눈에 띄는 변화가 생겼을 거예요!',days:[
+        {day:'Day 1',items:[{t:'상체 집중 맨몸 40분',c:''}],k:'약 430 kcal'},
+        {day:'Day 2',items:[{t:'하체 집중 맨몸 40분',c:''}],k:'약 450 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'전신 서킷 4라운드',c:''}],k:'약 480 kcal'},
+        {day:'Day 5',items:[{t:'코어+전신 마무리',c:''}],k:'약 400 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭+폼롤러',c:''}],k:'회복'},
+      ]},
+    ],
+    etc:[
+      {label:'1주차',desc:'꾸준히 근력 운동을 합니다.',days:[
+        {day:'Day 1',items:[{t:'스쿼트+푸시업 각 10개 × 3세트',c:''}],k:'약 220 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'런지+플랭크 각 12개/30초 × 3세트',c:''}],k:'약 240 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'전신 운동 30분',c:''}],k:'약 280 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭',c:''}],k:'회복'},
+      ]},
+      {label:'2주차',desc:'볼륨을 늘립니다.',days:[
+        {day:'Day 1',items:[{t:'상체 집중 운동 35분',c:''}],k:'약 300 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'하체 집중 운동 35분',c:''}],k:'약 320 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'전신 운동 40분',c:''}],k:'약 380 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'3주차',desc:'강도를 올립니다.',days:[
+        {day:'Day 1',items:[{t:'상체 고강도 40분',c:''}],k:'약 400 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'하체 고강도 40분',c:''}],k:'약 420 kcal'},
+        {day:'Day 4',items:[{t:'가벼운 유산소',c:'cardio'}],k:'약 200 kcal'},
+        {day:'Day 5',items:[{t:'전신 서킷 45분',c:''}],k:'약 450 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭',c:''}],k:'회복'},
+      ]},
+      {label:'4주차 — 완성',desc:'꾸준함이 최고의 무기예요!',days:[
+        {day:'Day 1',items:[{t:'상체 최고강도',c:''}],k:'약 450 kcal'},
+        {day:'Day 2',items:[{t:'하체 최고강도',c:''}],k:'약 460 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'전신 운동 50분',c:''}],k:'약 500 kcal'},
+        {day:'Day 5',items:[{t:'코어+마무리',c:''}],k:'약 380 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭+휴식',c:''}],k:'회복'},
+      ]},
+    ],
+  },
+  health:{
+    outdoor:[
+      {label:'1주차 — 활동 시작',desc:'하루 30분 몸을 움직이는 습관을 만듭니다.',days:[
+        {day:'Day 1',items:[{t:'파워 워킹 30분',c:'cardio'}],k:'약 180 kcal'},
+        {day:'Day 2',items:[{t:'휴식 or 산책',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'파워 워킹 30분',c:'cardio'},{t:'스트레칭 10분',c:''}],k:'약 190 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'파워 워킹 35분',c:'cardio'},{t:'스쿼트 10개 × 2세트',c:''}],k:'약 220 kcal'},
+        {day:'Day 6',items:[{t:'산책 20분',c:'cardio'}],k:'약 100 kcal'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'2주차 — 균형 잡기',desc:'유산소와 가벼운 근력을 균형있게 합니다.',days:[
+        {day:'Day 1',items:[{t:'조깅 20분',c:'cardio'},{t:'스트레칭 10분',c:''}],k:'약 250 kcal'},
+        {day:'Day 2',items:[{t:'파워 워킹 30분',c:'cardio'}],k:'약 180 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'조깅 25분',c:'cardio'},{t:'플랭크 30초 × 2세트',c:''}],k:'약 280 kcal'},
+        {day:'Day 5',items:[{t:'파워 워킹 35분',c:'cardio'}],k:'약 210 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'산책+스트레칭',c:'cardio'}],k:'약 150 kcal'},
+      ]},
+      {label:'3주차 — 꾸준함',desc:'일정한 페이스를 유지합니다.',days:[
+        {day:'Day 1',items:[{t:'조깅 30분',c:'cardio'}],k:'약 280 kcal'},
+        {day:'Day 2',items:[{t:'파워 워킹 40분',c:'cardio'}],k:'약 240 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'조깅 30분',c:'cardio'},{t:'코어 운동 15분',c:''}],k:'약 330 kcal'},
+        {day:'Day 5',items:[{t:'등산 or 자전거 40분',c:'cardio'}],k:'약 350 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'산책+스트레칭',c:'cardio'}],k:'약 150 kcal'},
+      ]},
+      {label:'4주차 — 생활 속 운동',desc:'운동이 일상이 되었어요!',days:[
+        {day:'Day 1',items:[{t:'조깅 35분',c:'cardio'}],k:'약 320 kcal'},
+        {day:'Day 2',items:[{t:'파워 워킹 40분',c:'cardio'}],k:'약 250 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'조깅 35분',c:'cardio'},{t:'스트레칭 15분',c:''}],k:'약 340 kcal'},
+        {day:'Day 5',items:[{t:'등산 or 자전거 50분',c:'cardio'}],k:'약 400 kcal'},
+        {day:'Day 6',items:[{t:'가벼운 활동 20분',c:'cardio'}],k:'약 120 kcal'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+    ],
+    gym:[
+      {label:'1주차 — 기구 친해지기',desc:'기구와 친해집니다.',days:[
+        {day:'Day 1',items:[{t:'트레드밀 워킹 30분',c:'cardio'},{t:'스트레칭',c:''}],k:'약 220 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'사이클 25분',c:'cardio'},{t:'레그프레스 10개 × 2세트',c:''}],k:'약 240 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'트레드밀 30분',c:'cardio'},{t:'체스트프레스 10개 × 2세트',c:''}],k:'약 260 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭',c:''}],k:'회복'},
+      ]},
+      {label:'2주차',desc:'유산소와 근력을 균형있게.',days:[
+        {day:'Day 1',items:[{t:'트레드밀 조깅 25분',c:'cardio'},{t:'전신 머신 20분',c:''}],k:'약 320 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'사이클 30분',c:'cardio'},{t:'코어 15분',c:''}],k:'약 300 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'전신 순환 운동 40분',c:''}],k:'약 350 kcal'},
+        {day:'Day 6',items:[{t:'가벼운 유산소 20분',c:'cardio'}],k:'약 180 kcal'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'3주차',desc:'꾸준히 유지합니다.',days:[
+        {day:'Day 1',items:[{t:'트레드밀 30분',c:'cardio'},{t:'하체 머신 20분',c:''}],k:'약 380 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'사이클 30분',c:'cardio'},{t:'상체 머신 20분',c:''}],k:'약 360 kcal'},
+        {day:'Day 4',items:[{t:'가벼운 유산소 25분',c:'cardio'}],k:'약 200 kcal'},
+        {day:'Day 5',items:[{t:'전신 순환 운동 45분',c:''}],k:'약 400 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'스트레칭',c:''}],k:'회복'},
+      ]},
+      {label:'4주차 — 습관 완성',desc:'건강한 생활 루틴이 완성됐어요!',days:[
+        {day:'Day 1',items:[{t:'유산소 35분',c:'cardio'},{t:'전신 머신 25분',c:''}],k:'약 450 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'유산소 35분',c:'cardio'},{t:'코어+스트레칭 20분',c:''}],k:'약 400 kcal'},
+        {day:'Day 4',items:[{t:'유산소 30분',c:'cardio'}],k:'약 220 kcal'},
+        {day:'Day 5',items:[{t:'전신 순환 운동 50분',c:''}],k:'약 460 kcal'},
+        {day:'Day 6',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+    ],
+    home:[
+      {label:'1주차 — 시작',desc:'집에서 건강 유지 루틴을 만듭니다.',days:[
+        {day:'Day 1',items:[{t:'유튜브 요가 or 스트레칭 20분',c:''}],k:'약 100 kcal'},
+        {day:'Day 2',items:[{t:'제자리 걷기 20분',c:'cardio'}],k:'약 120 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'홈트 영상 20분',c:'cardio'}],k:'약 150 kcal'},
+        {day:'Day 5',items:[{t:'스쿼트+플랭크 가볍게',c:''}],k:'약 130 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭 15분',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'2주차',desc:'활동량을 늘립니다.',days:[
+        {day:'Day 1',items:[{t:'홈트 영상 25분',c:'cardio'}],k:'약 180 kcal'},
+        {day:'Day 2',items:[{t:'요가 or 스트레칭 25분',c:''}],k:'약 100 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'전신 가벼운 운동 30분',c:''}],k:'약 200 kcal'},
+        {day:'Day 5',items:[{t:'제자리 뛰기+스쿼트 20분',c:'cardio'}],k:'약 220 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'3주차',desc:'균형있는 루틴을 유지합니다.',days:[
+        {day:'Day 1',items:[{t:'홈트 영상 30분',c:'cardio'}],k:'약 240 kcal'},
+        {day:'Day 2',items:[{t:'요가 30분',c:''}],k:'약 120 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'전신 운동 35분',c:''}],k:'약 280 kcal'},
+        {day:'Day 5',items:[{t:'유산소 25분',c:'cardio'},{t:'코어 10분',c:''}],k:'약 250 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'4주차 — 완성',desc:'건강한 홈트 루틴이 완성됐어요!',days:[
+        {day:'Day 1',items:[{t:'홈트 영상 35분',c:'cardio'}],k:'약 280 kcal'},
+        {day:'Day 2',items:[{t:'요가 or 명상 30분',c:''}],k:'약 120 kcal'},
+        {day:'Day 3',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 4',items:[{t:'전신 운동 40분',c:''}],k:'약 320 kcal'},
+        {day:'Day 5',items:[{t:'유산소 30분',c:'cardio'},{t:'코어 15분',c:''}],k:'약 300 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭+폼롤러',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+    ],
+    etc:[
+      {label:'1주차',desc:'꾸준한 활동이 목표입니다.',days:[
+        {day:'Day 1',items:[{t:'30분 가벼운 활동',c:'cardio'}],k:'약 150 kcal'},
+        {day:'Day 2',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 3',items:[{t:'30분 활동+스트레칭',c:'cardio'}],k:'약 170 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'40분 활동',c:'cardio'}],k:'약 200 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'2주차',desc:'활동량을 늘립니다.',days:[
+        {day:'Day 1',items:[{t:'40분 활동',c:'cardio'}],k:'약 220 kcal'},
+        {day:'Day 2',items:[{t:'스트레칭 20분',c:''}],k:'회복'},
+        {day:'Day 3',items:[{t:'40분 활동+코어 10분',c:'cardio'}],k:'약 250 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'50분 활동',c:'cardio'}],k:'약 300 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'3주차',desc:'꾸준히 유지합니다.',days:[
+        {day:'Day 1',items:[{t:'50분 활동',c:'cardio'}],k:'약 320 kcal'},
+        {day:'Day 2',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 3',items:[{t:'50분 활동+코어',c:'cardio'}],k:'약 340 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'60분 활동',c:'cardio'}],k:'약 380 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+      {label:'4주차 — 완성',desc:'건강한 습관이 완성됐어요!',days:[
+        {day:'Day 1',items:[{t:'60분 활동',c:'cardio'}],k:'약 380 kcal'},
+        {day:'Day 2',items:[{t:'스트레칭+코어',c:''}],k:'회복'},
+        {day:'Day 3',items:[{t:'60분 활동',c:'cardio'}],k:'약 380 kcal'},
+        {day:'Day 4',items:[{t:'휴식',c:'rest'}],k:'회복'},
+        {day:'Day 5',items:[{t:'60분 활동+코어 15분',c:'cardio'}],k:'약 420 kcal'},
+        {day:'Day 6',items:[{t:'스트레칭',c:''}],k:'회복'},
+        {day:'Day 7',items:[{t:'완전 휴식',c:'rest'}],k:'회복'},
+      ]},
+    ],
+  },
+};
+
+function switchWeek(w, btn) {
+  currentWeek = w;
+  document.querySelectorAll('.tabs').forEach(function(t) {
+    t.querySelectorAll('.tab').forEach(function(b) {
+      if (['1주차','2주차','3주차','4주차'].includes(b.textContent)) b.classList.remove('active');
+    });
+  });
+  btn.classList.add('active');
+  renderWeek();
+}
+
+function renderWeek() {
+  var plan = P[currentGoal] && P[currentGoal][currentPlace];
+  if (!plan) return;
+  var week = plan[currentWeek - 1];
+  var html = '<div style="font-size:13px;color:var(--green);font-weight:700;margin-bottom:4px;">'+week.label+'</div>'+
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:1rem;">'+week.desc+'</div>';
+  week.days.forEach(function(d) {
+    var pills = d.items.map(function(it) {
+      return '<span class="schedule-pill'+(it.c==='rest'?' rest':it.c==='cardio'?' cardio':'')+'">'+it.t+'</span>';
+    }).join('');
+    html += '<div class="schedule-row">'+
+      '<div class="schedule-day">'+d.day+'</div>'+
+      '<div class="schedule-items">'+pills+'</div>'+
+      '<div class="schedule-kcal">'+d.k+'</div>'+
+    '</div>';
+  });
+  document.getElementById('week-schedule').innerHTML = html;
+}
+
+function calcBMI(w) {
+  var h = parseFloat(document.getElementById('height-input').value) || 172;
+  return w / ((h/100)*(h/100));
+}
+function bmiTag(bmi) {
+  if (bmi<18.5) return {tag:'저체중',color:'#378ADD'};
+  if (bmi<23) return {tag:'정상',color:'#1D9E75'};
+  if (bmi<25) return {tag:'과체중',color:'#EF9F27'};
+  if (bmi<30) return {tag:'비만 1단계',color:'#E24B4A'};
+  return {tag:'비만 2단계',color:'#c1121f'};
+}
+function updateAll() {
+  var h = parseFloat(document.getElementById('height-input').value) || 172;
+  var w = parseFloat(document.getElementById('weight-input').value) || 78;
+  var bmi = w/((h/100)*(h/100));
+  var info = bmiTag(bmi);
+  var normalMax = 23*(h/100)*(h/100);
+  var diff = Math.max(w-normalMax, 0);
+  document.getElementById('bmi-num').textContent = bmi.toFixed(1);
+  document.getElementById('bmi-tag').textContent = info.tag;
+  document.getElementById('bmi-tag').style.background = info.color+'22';
+  document.getElementById('bmi-tag').style.color = info.color;
+  var left = Math.min(Math.max((bmi-15)/(35-15)*100, 2), 98);
+  document.getElementById('bmi-marker').style.left = left+'%';
+  document.getElementById('bmi-desc').textContent = diff>0 ? '정상 범위까지 약 '+diff.toFixed(1)+'kg 감량 권장' : '정상 범위입니다!';
+  document.getElementById('target-weight').textContent = normalMax.toFixed(1);
+  document.getElementById('need-loss').textContent = diff>0 ? diff.toFixed(1) : '0';
+}
+function saveWeight() {
+  var w = parseFloat(document.getElementById('weight-input').value);
+  if (w) {
+    localStorage.setItem('workout_weight', w);
+    var btn = document.querySelector('.weight-save-btn');
+    btn.textContent = '저장됨 ✓';
+    setTimeout(function(){btn.textContent='저장';}, 1500);
+  }
+}
+function saveHeight() {
+  var h = parseFloat(document.getElementById('height-input').value);
+  if (h) {
+    localStorage.setItem('workout_height', h);
+    var btns = document.querySelectorAll('.weight-save-btn');
+    btns[0].textContent = '저장됨 ✓';
+    setTimeout(function(){btns[0].textContent='저장';}, 1500);
+  }
+}
+
+renderWorkouts();
+var savedG = localStorage.getItem('workout_goal');
+var savedPl = localStorage.getItem('workout_place');
+if (savedG && document.getElementById('goal-'+savedG)) {
+  currentGoal = savedG;
+  document.querySelectorAll('[id^="goal-"]').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('goal-'+savedG).classList.add('active');
+}
+if (savedPl && document.getElementById('place-'+savedPl)) {
+  currentPlace = savedPl;
+  document.querySelectorAll('[id^="place-"]').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('place-'+savedPl).classList.add('active');
+}
+var savedH = localStorage.getItem('workout_height');
+if (savedH) document.getElementById('height-input').value = savedH;
+var savedW = localStorage.getItem('workout_weight');
+if (savedW) document.getElementById('weight-input').value = savedW;
+updateLabels();
+renderWeek();
+updateAll();
+</script>
+</body>
+</html>
