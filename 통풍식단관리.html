@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>통풍 식단 관리</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f8f9fa; --text: #202124; --text2: #5f6368; --text3: #9aa0a6;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --blue: #1a73e8; --green: #34a853; --red: #ea4335; --amber: #fbbc04;
+    --radius: 8px; --radius-lg: 12px;
+  }
+  body { font-family: 'Malgun Gothic','맑은 고딕',-apple-system,BlinkMacSystemFont,sans-serif; background:#f1f3f4; color:var(--text); font-size:13px; min-height:100vh; }
+  .app { max-width:720px; margin:0 auto; padding:24px 20px; }
+
+  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:8px; }
+  .topbar h1 { font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; }
+  .date-label { font-size:12px; color:var(--text2); }
+
+  .stat-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+  .stat { background:var(--bg); border-radius:var(--radius); padding:12px 16px; border:1px solid var(--border); }
+  .stat .lbl { font-size:11px; color:var(--text2); margin-bottom:4px; }
+  .stat .val { font-size:22px; font-weight:600; }
+
+  .warn-box { background:#fce8e6; border:1px solid #f5c6c3; border-radius:var(--radius); padding:10px 14px; font-size:12px; color:#c5221f; margin-bottom:16px; display:none; line-height:1.6; }
+
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px 20px; margin-bottom:14px; }
+  .card-title { font-size:12px; font-weight:600; color:var(--text2); margin-bottom:10px; }
+
+  .water-cups { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .cup { width:32px; height:32px; border-radius:var(--radius); border:1px solid var(--border2); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:background .15s,border-color .15s; }
+  .cup.filled { background:#e8f0fe; border-color:#93b6f5; }
+  .water-info { font-size:11px; color:var(--text2); margin-left:8px; }
+
+  .search-row { display:flex; gap:8px; margin-bottom:8px; }
+  .search-row input { flex:1; font-size:13px; padding:8px 10px; border:1px solid var(--border2); border-radius:var(--radius); background:var(--bg); color:var(--text); font-family:inherit; }
+  .search-row input:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(26,115,232,.12); }
+  .search-row button { padding:8px 16px; font-size:12px; cursor:pointer; border:1px solid var(--blue); background:var(--blue); color:#fff; border-radius:var(--radius); font-family:inherit; white-space:nowrap; }
+  .search-row button:hover { background:#1557b0; }
+
+  .suggestions { border:1px solid var(--border2); border-radius:var(--radius); overflow:hidden; margin-bottom:8px; display:none; }
+  .sug-item { padding:9px 12px; font-size:13px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+  .sug-item:last-child { border-bottom:none; }
+  .sug-item:hover { background:var(--bg2); }
+
+  .risk-badge { font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
+  .r-high  { background:#fce8e6; color:#c5221f; }
+  .r-mid   { background:#fef7e0; color:#b06000; }
+  .r-low   { background:#e6f4ea; color:#1e7e34; }
+  .r-safe  { background:#e8f0fe; color:#1a5cb0; }
+
+  .hint { font-size:11px; color:var(--text2); line-height:1.7; }
+
+  .log-list { display:flex; flex-direction:column; gap:8px; }
+  .log-item { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:12px 16px; border-left-width:3px; }
+  .log-item.high  { border-left-color:#ea4335; }
+  .log-item.mid   { border-left-color:#fbbc04; }
+  .log-item.low   { border-left-color:#34a853; }
+  .log-item.safe  { border-left-color:#1a73e8; }
+  .log-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+  .log-name { font-size:14px; font-weight:600; }
+  .log-meta { font-size:11px; color:var(--text2); margin-bottom:8px; }
+  .alt-box { background:var(--bg2); border-radius:var(--radius); padding:9px 12px; font-size:12px; }
+  .alt-title { font-size:11px; font-weight:600; color:var(--text2); margin-bottom:5px; }
+  .alt-chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { background:var(--bg); border:1px solid var(--border2); border-radius:20px; padding:2px 10px; font-size:11px; color:var(--text); }
+  .safe-msg { color:#1e7e34; font-size:12px; }
+  .del-btn { background:none; border:none; cursor:pointer; color:var(--text3); font-size:16px; padding:2px 6px; border-radius:4px; line-height:1; }
+  .del-btn:hover { color:var(--red); background:var(--bg2); }
+
+  .empty { text-align:center; padding:3rem; color:var(--text2); font-size:13px; line-height:2; }
+  .section-label { font-size:12px; font-weight:600; color:var(--text2); margin-bottom:8px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <h1>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ea4335" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      통풍 식단 관리
+    </h1>
+    <span class="date-label" id="dateLabel"></span>
+  </div>
+
+  <div id="warnBox" class="warn-box">
+    ⚠️ <strong>주의!</strong> 오늘 고위험 음식을 여러 번 드셨어요.<br>
+    수분을 충분히 섭취하고 저퓨린 식단으로 조절해보세요.
+  </div>
+
+  <div class="stat-bar">
+    <div class="stat">
+      <div class="lbl">오늘 퓨린 섭취</div>
+      <div class="val" id="statPurine" style="color:#ea4335">0<span style="font-size:13px;font-weight:400"> mg</span></div>
+    </div>
+    <div class="stat">
+      <div class="lbl">고위험 음식</div>
+      <div class="val" id="statHigh" style="color:#c5221f">0<span style="font-size:13px;font-weight:400"> 건</span></div>
+    </div>
+    <div class="stat">
+      <div class="lbl">오늘 기록</div>
+      <div class="val" id="statCount" style="color:#1a73e8">0<span style="font-size:13px;font-weight:400"> 건</span></div>
+    </div>
+  </div>
+
+  <!-- 물 섭취 -->
+  <div class="card">
+    <div class="card-title">💧 물 섭취량 (하루 목표 8잔 · 약 2L)</div>
+    <div class="water-cups" id="waterCups"></div>
+  </div>
+
+  <!-- 음식 검색 -->
+  <div class="card">
+    <div class="card-title">🔍 음식 검색 및 추가</div>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="음식 이름 검색... (예: 삼겹살, 두부, 맥주)" oninput="onSearch()" onkeydown="if(event.key==='Enter')addFirst()">
+      <button onclick="addFirst()">+ 추가</button>
+    </div>
+    <div class="suggestions" id="suggestions"></div>
+    <div class="hint">
+      🔴 고위험: 퓨린 150mg/100g 이상 &nbsp;|&nbsp;
+      🟡 주의: 50~150mg &nbsp;|&nbsp;
+      🟢 낮음: 50mg 이하 &nbsp;|&nbsp;
+      🔵 안전: 거의 없음
+    </div>
+  </div>
+
+  <!-- 기록 -->
+  <div class="section-label">오늘 식사 기록</div>
+  <div class="log-list" id="logList"></div>
+  <div class="empty" id="emptyMsg">
+    🥗<br>아직 기록된 음식이 없어요.<br>위에서 음식을 검색해 추가해보세요.
+  </div>
+
+</div>
+
+<script>
+const FOODS = [
+  {name:'맥주',purine:14,risk:'mid',alts:['탄산수','보리차','레몬수']},
+  {name:'소주',purine:0,risk:'low',alts:['탄산수','보리차']},
+  {name:'막걸리',purine:12,risk:'mid',alts:['탄산수','식혜(소량)']},
+  {name:'와인',purine:0,risk:'low',alts:['포도주스','탄산수']},
+  {name:'청어',purine:210,risk:'high',alts:['달걀','두부','닭가슴살(소량)']},
+  {name:'멸치',purine:239,risk:'high',alts:['다시마육수','채소육수','표고버섯육수']},
+  {name:'고등어',purine:194,risk:'high',alts:['달걀','두부','닭가슴살']},
+  {name:'꽁치',purine:154,risk:'high',alts:['달걀','두부','흰살생선(소량)']},
+  {name:'새우',purine:273,risk:'high',alts:['달걀','두부','닭가슴살']},
+  {name:'오징어',purine:193,risk:'high',alts:['달걀','두부','닭가슴살']},
+  {name:'참치통조림',purine:116,risk:'mid',alts:['달걀','두부','닭가슴살']},
+  {name:'연어',purine:119,risk:'mid',alts:['달걀','두부','닭가슴살']},
+  {name:'돼지간',purine:289,risk:'high',alts:['닭가슴살','달걀','두부']},
+  {name:'닭간',purine:312,risk:'high',alts:['닭가슴살','달걀','두부']},
+  {name:'소간',purine:237,risk:'high',alts:['닭가슴살','달걀','두부']},
+  {name:'삼겹살',purine:96,risk:'mid',alts:['닭가슴살','두부','달걀']},
+  {name:'소고기',purine:110,risk:'mid',alts:['닭가슴살(소량)','두부','달걀']},
+  {name:'닭가슴살',purine:115,risk:'mid',alts:['두부','달걀','콩나물']},
+  {name:'닭다리',purine:122,risk:'mid',alts:['닭가슴살(소량)','두부','달걀']},
+  {name:'햄',purine:138,risk:'mid',alts:['닭가슴살','두부','달걀']},
+  {name:'소시지',purine:95,risk:'mid',alts:['닭가슴살','두부','달걀']},
+  {name:'순대',purine:120,risk:'mid',alts:['두부','달걀','닭가슴살']},
+  {name:'라면',purine:60,risk:'low',alts:['쌀국수','우동(소량)','칼국수']},
+  {name:'두부',purine:68,risk:'low',alts:[]},
+  {name:'달걀',purine:3,risk:'safe',alts:[]},
+  {name:'우유',purine:0,risk:'safe',alts:[]},
+  {name:'치즈',purine:7,risk:'safe',alts:[]},
+  {name:'요거트',purine:8,risk:'safe',alts:[]},
+  {name:'흰쌀밥',purine:18,risk:'safe',alts:[]},
+  {name:'빵',purine:14,risk:'safe',alts:[]},
+  {name:'감자',purine:16,risk:'safe',alts:[]},
+  {name:'고구마',purine:11,risk:'safe',alts:[]},
+  {name:'배추',purine:21,risk:'safe',alts:[]},
+  {name:'시금치',purine:57,risk:'low',alts:['상추','양배추','오이']},
+  {name:'버섯',purine:58,risk:'low',alts:['양배추','오이','당근']},
+  {name:'콩나물',purine:50,risk:'low',alts:['숙주나물','상추','양배추']},
+  {name:'된장찌개',purine:55,risk:'low',alts:['계란국','미역국']},
+  {name:'김치',purine:10,risk:'safe',alts:[]},
+  {name:'미역국',purine:15,risk:'safe',alts:[]},
+  {name:'사과',purine:14,risk:'safe',alts:[]},
+  {name:'바나나',purine:57,risk:'low',alts:['사과','배','딸기']},
+  {name:'포도',purine:27,risk:'safe',alts:[]},
+  {name:'오렌지주스',purine:0,risk:'safe',alts:[]},
+  {name:'초콜릿',purine:37,risk:'safe',alts:[]},
+  {name:'커피',purine:0,risk:'safe',alts:[]},
+  {name:'녹차',purine:0,risk:'safe',alts:[]},
+  {name:'건어물',purine:300,risk:'high',alts:['달걀','두부','닭가슴살']},
+  {name:'젓갈',purine:280,risk:'high',alts:['김치(소량)','된장(소량)']},
+  {name:'굴',purine:107,risk:'mid',alts:['달걀','두부']},
+  {name:'조개',purine:136,risk:'mid',alts:['달걀','두부']},
+  {name:'게',purine:152,risk:'high',alts:['달걀','두부','닭가슴살']},
+  {name:'낙지',purine:137,risk:'mid',alts:['달걀','두부']},
+  {name:'아이스크림',purine:0,risk:'safe',alts:[]},
+  {name:'흰살생선',purine:80,risk:'mid',alts:['달걀','두부']},
+  {name:'두유',purine:25,risk:'safe',alts:[]},
+  {name:'상추',purine:13,risk:'safe',alts:[]},
+  {name:'오이',purine:7,risk:'safe',alts:[]},
+  {name:'당근',purine:8,risk:'safe',alts:[]},
+  {name:'토마토',purine:11,risk:'safe',alts:[]},
+];
+
+const RISK_LABEL = {high:'고위험',mid:'주의',low:'낮음',safe:'안전'};
+const RISK_CLASS = {high:'r-high',mid:'r-mid',low:'r-low',safe:'r-safe'};
+const LOG_CLASS  = {high:'high',mid:'mid',low:'low',safe:'safe'};
+
+let log = [];
+let nid = 1;
+let water = 0;
+let filtered = [];
+
+document.getElementById('dateLabel').textContent =
+  new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+
+function onSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const box = document.getElementById('suggestions');
+  if (!q) { box.style.display='none'; filtered=[]; return; }
+  filtered = FOODS.filter(f => f.name.includes(q)).slice(0, 8);
+  if (!filtered.length) { box.style.display='none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = filtered.map((f, i) => `
+    <div class="sug-item" onclick="addFood(${i})">
+      <span>${f.name}</span>
+      <span style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text2)">퓨린 ~${f.purine}mg</span>
+        <span class="risk-badge ${RISK_CLASS[f.risk]}">${RISK_LABEL[f.risk]}</span>
+      </span>
+    </div>`).join('');
+}
+
+function addFirst() {
+  if (filtered.length) { addFood(0); return; }
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+  const now = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  log.unshift({id:nid++,name:q,purine:0,risk:'safe',alts:[],time:now,custom:true});
+  document.getElementById('searchInput').value='';
+  filtered=[];
+  render();
+}
+
+function addFood(idx) {
+  const f = filtered[idx];
+  const now = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  log.unshift({id:nid++,...f,time:now});
+  document.getElementById('searchInput').value='';
+  document.getElementById('suggestions').style.display='none';
+  filtered=[];
+  render();
+}
+
+function delLog(id) {
+  log = log.filter(o => o.id !== id);
+  render();
+}
+
+function setWater(n) {
+  water = (water === n) ? n - 1 : n;
+  renderWater();
+}
+
+function renderWater() {
+  const cups = document.getElementById('waterCups');
+  cups.innerHTML = Array.from({length:8}, (_,i) =>
+    `<div class="cup ${i < water ? 'filled' : ''}" onclick="setWater(${i+1})" title="${i+1}잔">
+      ${i < water ? '💧' : '🫙'}
+    </div>`
+  ).join('') + `<span class="water-info">${water} / 8잔 (약 ${(water*0.25).toFixed(1)}L)</span>`;
+}
+
+function render() {
+  const totalPurine = log.reduce((s,o) => s + o.purine, 0);
+  const highCount   = log.filter(o => o.risk === 'high').length;
+
+  document.getElementById('statPurine').innerHTML = Math.round(totalPurine) + '<span style="font-size:13px;font-weight:400"> mg</span>';
+  document.getElementById('statHigh').innerHTML   = highCount + '<span style="font-size:13px;font-weight:400"> 건</span>';
+  document.getElementById('statCount').innerHTML  = log.length + '<span style="font-size:13px;font-weight:400"> 건</span>';
+
+  document.getElementById('warnBox').style.display = highCount >= 2 ? 'block' : 'none';
+
+  const list  = document.getElementById('logList');
+  const empty = document.getElementById('emptyMsg');
+
+  if (!log.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = log.map(o => {
+    const altHtml = o.alts && o.alts.length
+      ? `<div class="alt-box">
+          <div class="alt-title">🔄 대체 음식 추천</div>
+          <div class="alt-chips">${o.alts.map(a => `<span class="chip">${a}</span>`).join('')}</div>
+        </div>`
+      : o.risk === 'safe'
+        ? `<div class="alt-box"><span class="safe-msg">✅ 통풍에 안전한 음식이에요. 안심하고 드세요!</span></div>`
+        : '';
+    const metaText = o.custom
+      ? '퓨린 정보 없음 (직접 입력)'
+      : `퓨린 약 ${o.purine}mg/100g · <span class="risk-badge ${RISK_CLASS[o.risk]}">${RISK_LABEL[o.risk]}</span>`;
+
+    return `<div class="log-item ${LOG_CLASS[o.risk]}">
+      <div class="log-top">
+        <span class="log-name">${o.name}</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--text2)">${o.time}</span>
+          <button class="del-btn" onclick="delLog(${o.id})" title="삭제">✕</button>
+        </span>
+      </div>
+      <div class="log-meta">${metaText}</div>
+      ${altHtml}
+    </div>`;
+  }).join('');
+}
+
+renderWater();
+render();
+</script>
+</body>
+</html>
