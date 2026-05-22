@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<!-- saved from url=(0104)file:///C:/Users/User/Downloads/%EB%8F%99%EC%95%84%EB%A6%AC_%EC%A3%BC%EB%AC%B8%EC%8B%9C%ED%8A%B8_29.html -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>발명교육 활성화 주문시트</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f8f9fa; --text: #202124; --text2: #5f6368; --text3: #9aa0a6;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --blue: #1a73e8; --blue-bg: #e8f0fe; --green: #34a853; --red: #ea4335;
+    --radius: 8px; --radius-lg: 12px;
+  }
+  body { font-family: 'Malgun Gothic','맑은 고딕',-apple-system,BlinkMacSystemFont,sans-serif; background:#f1f3f4; color:var(--text); font-size:13px; min-height:100vh; }
+  .app { max-width:1400px; margin:0 auto; padding:24px 20px; }
+
+  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+  .topbar h1 { font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; }
+
+  .layout { display:flex; gap:0; min-height:calc(100vh - 160px); }
+  .sidebar-nav { width:160px; flex-shrink:0; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:8px; margin-right:16px; height:fit-content; position:sticky; top:0; }
+  .tab { display:flex; align-items:center; gap:9px; padding:10px 14px; font-size:13px; cursor:pointer; border:none; background:transparent; color:var(--text2); border-radius:var(--radius); margin-bottom:3px; transition:all .15s; font-family:inherit; width:100%; text-align:left; font-weight:400; }
+  .tab:hover { background:var(--bg2); color:var(--text); }
+  .tab.active { background:var(--blue-bg); color:var(--blue); font-weight:600; }
+  .tab-icon { font-size:16px; width:20px; text-align:center; flex-shrink:0; }
+  .tab-bar { display:none; }
+  .sec { display:none; flex:1; min-width:0; } .sec.active { display:block; }
+
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; font-size:12px; cursor:pointer; border:1px solid var(--border2); background:var(--bg); color:var(--text); border-radius:var(--radius); transition:background .1s,transform .1s; white-space:nowrap; font-family:inherit; height:32px; }
+  .btn:hover { background:var(--bg2); } .btn:active { transform:scale(.98); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .btn-blue  { background:var(--blue);  color:#fff; border-color:var(--blue);  } .btn-blue:hover  { background:#1557b0; }
+  .btn-green { background:var(--green); color:#fff; border-color:var(--green); } .btn-green:hover { background:#1e8e3e; }
+  .btn-red   { background:var(--red);   color:#fff; border-color:var(--red);   } .btn-red:hover   { background:#c5221f; }
+  .btn-sm { height:26px; padding:3px 8px; font-size:11px; }
+
+  .toolbar { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+  .toolbar input, .toolbar select { font-size:12px; padding:5px 9px; height:32px; border:1px solid var(--border2); border-radius:var(--radius); background:var(--bg); color:var(--text); font-family:inherit; }
+  .toolbar input { min-width:160px; }
+  .toolbar input:focus, .toolbar select:focus { outline:2px solid var(--blue); outline-offset:-1px; }
+
+  .sum-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:20px; }
+  .sum-card { background:var(--bg); border-radius:var(--radius); padding:12px 16px; border:1px solid var(--border); }
+  .sum-card .lbl { font-size:11px; color:var(--text2); margin-bottom:4px; }
+  .sum-card .val { font-size:20px; font-weight:600; }
+  .sum-card .val.blue { color:var(--blue); } .sum-card .val.green { color:var(--green); }
+
+  .tbl-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--bg); }
+  table { width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; min-width:1000px; }
+  thead th { padding:10px 8px; font-weight:600; font-size:11px; color:var(--text2); background:var(--bg2); border-bottom:1px solid var(--border); white-space:nowrap; text-align:left; overflow:hidden; text-overflow:ellipsis; }
+  thead th.r { text-align:right; } thead th.c { text-align:center; }
+  tbody tr { border-bottom:1px solid var(--border); transition:background .1s; }
+  tbody tr:last-child { border-bottom:none; } tbody tr:hover { background:var(--bg2); }
+  tbody td { padding:8px; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  tbody td.r { text-align:right; } tbody td.c { text-align:center; }
+
+  .status-sel { font-size:12px; padding:3px 6px; height:28px; border-radius:6px; border:1px solid var(--border2); background:var(--bg); color:var(--text); font-family:inherit; cursor:pointer; width:82px; font-weight:600; }
+  .status-sel.s-order  { background:#e1f5fe; color:#0277bd; border-color:#81d4fa; }
+  .status-sel.s-arrive { background:#e8f5e9; color:#2e7d32; border-color:#a5d6a7; }
+  .status-sel.s-none   { background:var(--bg); color:var(--text2); }
+  .status-badge { display:inline-flex; align-items:center; justify-content:center; padding:4px 11px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; border:none; font-family:inherit; transition:opacity .15s, transform .1s; white-space:nowrap; }
+  .status-badge:hover { opacity:.8; transform:scale(.97); }
+  .status-badge.s-none   { background:#f1f3f4; color:#5f6368; }
+  .status-badge.s-order  { background:#e8f0fe; color:#1a73e8; }
+  .status-badge.s-arrive { background:#e6f4ea; color:#2e7d32; }
+  tbody tr.row-order  { background:#f0f9ff; }
+  tbody tr.row-arrive { background:#f1f8e9; }
+  tbody tr.row-order:hover  { background:#dff0fa; }
+  tbody tr.row-arrive:hover { background:#e4f3d8; }
+
+  .form-card { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; max-width:900px; }
+  .form-card h3 { font-size:15px; font-weight:600; margin-bottom:16px; }
+  .frow { margin-bottom:12px; }
+  .frow label { display:block; font-size:11px; color:var(--text2); margin-bottom:4px; font-weight:600; }
+  .frow input, .frow select, .frow textarea { width:100%; font-size:13px; padding:8px 10px; border:1px solid var(--border2); border-radius:var(--radius); background:var(--bg); color:var(--text); font-family:inherit; }
+  .frow input:focus, .frow select:focus, .frow textarea:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(26,115,232,.15); }
+  .frow textarea { resize:vertical; min-height:60px; }
+  .f2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .f3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  .form-footer { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid var(--border); margin-top:6px; }
+
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:100; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--bg); border-radius:var(--radius-lg); border:1px solid var(--border); padding:24px; width:100%; max-width:540px; max-height:90vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,.18); }
+  .modal h3 { font-size:16px; font-weight:600; margin-bottom:16px; }
+  .mfooter { display:flex; justify-content:flex-end; gap:8px; margin-top:14px; }
+
+  .empty-msg { text-align:center; padding:3rem; color:var(--text2); font-size:13px; display:none; line-height:2; }
+  .nav-section-label { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; padding:6px 14px 3px; }
+  .nav-divider { height:1px; background:var(--border); margin:8px 4px; }
+  .nav-badge { margin-left:auto; font-size:10px; font-weight:600; background:var(--bg2); color:var(--text2); padding:1px 7px; border-radius:20px; }
+  .nav-badge-blue { background:#e8f0fe; color:var(--blue); }
+  .nav-badge-green { background:#e6f4ea; color:#2e7d32; }
+  a { color:var(--blue); text-decoration:none; } a:hover { text-decoration:underline; }
+
+  .toast { position:fixed; bottom:24px; right:24px; background:#323232; color:#fff; padding:10px 18px; border-radius:var(--radius); font-size:13px; z-index:999; opacity:0; transition:opacity .3s; pointer-events:none; }
+  .toast.show { opacity:1; }
+
+  @media (max-width: 768px) {
+    body { font-size: 14px; }
+    .app { padding: 10px; }
+    .topbar h1 { font-size: 15px; }
+    #refreshCountdown { display: none; }
+    .layout { display: block; min-height: unset; }
+    .sidebar-nav { display: none !important; }
+    .tab-bar {
+      display: flex !important; position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--bg); border-top: 1px solid var(--border);
+      z-index: 50; box-shadow: 0 -2px 12px rgba(0,0,0,.08);
+    }
+    .tab-bar-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 8px 4px 10px; font-size: 10px; color: var(--text2);
+      cursor: pointer; border: none; background: none; font-family: inherit; gap: 3px;
+    }
+    .tab-bar-item.active { color: var(--blue); }
+    .tab-bar-item .tbi-icon { font-size: 18px; line-height: 1; }
+    .sec { padding-bottom: 72px; }
+    .sum-bar { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .sum-card { padding: 10px 12px; }
+    .sum-card .val { font-size: 16px; }
+    .tbl-wrap { border: none; border-radius: 0; background: transparent; overflow: visible; }
+    table { display: none; }
+    .card-list { display: flex; flex-direction: column; gap: 8px; }
+    .order-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
+    .order-card.row-order  { background: #f0f9ff; border-color: #90caf9; }
+    .order-card.row-arrive { background: #f1f8e9; border-color: #a5d6a7; }
+    .order-card-title { font-size: 14px; font-weight: 600; line-height: 1.4; flex: 1; }
+    .order-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+    .order-card-meta { font-size: 11px; color: var(--text2); margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+    .order-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+    .order-card-price { font-size: 15px; font-weight: 700; }
+    .order-card-actions { display: flex; gap: 6px; align-items: center; }
+    .form-card { padding: 16px; }
+    .f2, .f3 { grid-template-columns: 1fr; }
+    .frow input, .frow select, .frow textarea { font-size: 14px; padding: 10px 12px; }
+    .form-footer { flex-direction: column; gap: 10px; align-items: stretch; }
+    .form-footer .btn { width: 100%; justify-content: center; height: 44px; font-size: 14px; }
+    .modal-overlay { padding: 0; align-items: flex-end; }
+    .modal { border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 90vh; padding: 20px 16px; }
+    .mfooter .btn { flex: 1; justify-content: center; height: 44px; font-size: 14px; }
+    .btn { height: 36px; font-size: 13px; }
+    .btn-sm { height: 32px; padding: 4px 10px; font-size: 12px; }
+    .status-badge { font-size: 12px; padding: 5px 12px; }
+    .toast { bottom: 80px; right: 12px; left: 12px; text-align: center; }
+  }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div style="background:#e8f4fd;border:1px solid #90caf9;border-radius:var(--radius);padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#1565c0;">
+    <span style="font-size:18px">📦</span>
+    <span><strong>도착 물품 수령 안내</strong> &nbsp;|&nbsp; 도착한 물품은 <strong>N104</strong>에서 수령 부탁드립니다.</span>
+  </div>
+  <div class="topbar">
+    <h1>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1"></rect><path d="M9 12h6M9 16h4"></path></svg>
+      발명교육 활성화 주문시트
+    </h1>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="refreshCountdown" style="font-size:11px;color:var(--text2)">28초 후 자동 새로고침</span>
+      <a href="https://docs.google.com/spreadsheets/d/1fr2b5REYH2ZKTgiKfnXSiS5sVBpTpqZ4DT0JbTN5Vew/edit?gid=1776115523#gid=1776115523" target="_blank" class="btn" style="gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        구글 시트 열기
+      </a>
+      <button class="btn btn-green" onclick="loadFromSheet();startCountdown();" id="btnLoad">↻ 새로고침</button>
+    </div>
+  </div>
+
+  <div class="layout">
+  <!-- 좌측 사이드 네비 -->
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">메뉴</div>
+    <button class="tab active" onclick="go(&#39;list&#39;,this)">
+      <span class="tab-icon">📋</span> 전체 목록
+    </button>
+    <button class="tab" onclick="go(&#39;add&#39;,this)">
+      <span class="tab-icon">➕</span> 항목 추가
+    </button>
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">상태별 보기</div>
+    <button class="tab" onclick="go(&#39;status-none&#39;,this)">
+      <span class="tab-icon">⏳</span> 미처리
+      <span class="nav-badge" id="badge-none">0</span>
+    </button>
+    <button class="tab" onclick="go(&#39;status-order&#39;,this)">
+      <span class="tab-icon">🛒</span> 주문완료
+      <span class="nav-badge nav-badge-blue" id="badge-order">4</span>
+    </button>
+    <button class="tab" onclick="go(&#39;status-arrive&#39;,this)">
+      <span class="tab-icon">✅</span> 도착
+      <span class="nav-badge nav-badge-green" id="badge-arrive">16</span>
+    </button>
+  </nav>
+
+  <!-- 주문 목록 -->
+  <div class="sec active" id="sec-list">
+    <div class="sum-bar" id="sumBar"><div class="sum-card" style="border-top:3px solid #1a73e8"><div class="lbl">📋 전체 항목</div><div class="val blue">20건</div></div><div class="sum-card" style="border-top:3px solid #9aa0a6"><div class="lbl">⏳ 미처리</div><div class="val" style="color:#5f6368">0건</div></div><div class="sum-card" style="border-top:3px solid #1a73e8"><div class="lbl">🛒 주문완료</div><div class="val" style="color:#1a73e8">4건</div></div><div class="sum-card" style="border-top:3px solid #34a853"><div class="lbl">✅ 도착</div><div class="val green">16건</div></div><div class="sum-card" style="border-top:3px solid #ea4335"><div class="lbl">💰 예상 총액</div><div class="val" style="color:#ea4335">₩515,471</div></div></div>
+    <div class="toolbar">
+      <input type="text" id="srch" placeholder="품명, 담당교사, 동아리 검색..." oninput="render()">
+      <select id="fTeacher" onchange="render()"><option value="">전체 담당교사</option><option value="김태현">김태현</option></select>
+      <select id="fClub" onchange="render()"><option value="">전체 동아리</option><option value="에너지 환경 탐구">에너지 환경 탐구</option></select>
+
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <colgroup>
+          <col style="width:36px"><col style="width:66px"><col style="width:98px"><col style="width:70px">
+          <col style="width:185px"><col style="width:44px"><col style="width:44px">
+          <col style="width:74px"><col style="width:58px"><col style="width:78px">
+          <col style="width:86px"><col style="width:130px"><col style="width:90px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>순번</th><th>담당교사</th>
+            <th>동아리명</th>
+            <th>활동명<br><span style="font-weight:400">간단</span></th>
+            <th>품명</th><th>규격</th><th class="r">수량</th>
+            <th class="r">예산단가</th><th class="r">배송비</th><th class="r">예상금액</th>
+            <th class="c">상태</th><th>구매처/사이트</th><th class="c">관리</th>
+          </tr>
+        </thead>
+        <tbody id="tBody"><tr class="row-arrive"><td style="color:var(--text2);text-align:center">1</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="내경 16mm PVC 호스" style="white-space:normal;line-height:1.4;font-size:12px">내경 16mm PVC 호스</td><td style="color:var(--text2)">m</td><td class="r">20</td><td class="r">₩1,000</td><td class="r">₩2,500</td><td class="r"><strong>₩22,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(0,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/sejongflexshop/products/11385962441?NaPm=ct%3Dmorf7o3s%7Cci%3D6f7a51221c96f53f97a2055f19cae6d71e7cb374%7Ctr%3Dslsl%7Csn%3D1032469%7Chk%3D94464d10c927e36a3319dea1a5cbe5b33dfb8d34&amp;nl-au=bce3f975e47b4f4490248bc6ec03559c&amp;nl-query=%EB%82%B4%EA%B2%BD+16mm+%ED%98%B8%EC%8A%A4#REVIEW" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(1)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(1)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">2</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="나사선 변환 커넥터" style="white-space:normal;line-height:1.4;font-size:12px">나사선 변환 커넥터</td><td style="color:var(--text2)">개</td><td class="r">15</td><td class="r">₩1,840</td><td class="r">₩1,900</td><td class="r"><strong>₩29,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(1,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/damoagwansu/products/9973183476?is_retargeting=true&amp;c=260101_p_Naver_product&amp;pid=Naver&amp;deep_link_value=https%3A%2F%2Fsmartstore.naver.com%2Fdamoagwansu%2Fproducts%2F9973183476%3Fka_ref%3Dkakao%26ka_req_id%3DgK6xKB__7LuyrI_D6-j4AQ%26ka_template%3Dcommerce_social_cta2&amp;dtm_source=KK&amp;dtm_detail=gK6xKB__7LuyrI_D6-j4AQ&amp;dtm_campaign=commerce_social_cta2&amp;dtm_medium=OG" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(2)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(2)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">3</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="암나사탭연결구(07번)" style="white-space:normal;line-height:1.4;font-size:12px">암나사탭연결구(07번)</td><td style="color:var(--text2)">개</td><td class="r">15</td><td class="r">₩440</td><td class="r">₩1,900</td><td class="r"><strong>₩8,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(2,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/damoagwansu/products/7862674566?is_retargeting=true&amp;c=260101_p_Naver_product&amp;pid=Naver&amp;deep_link_value=https%3A%2F%2Fsmartstore.naver.com%2Fdamoagwansu%2Fproducts%2F7862674566%3Fka_ref%3Dkakao%26ka_req_id%3DgK6v9uUgnqrIuUu1umjUAQ%26ka_template%3Dcommerce_social_cta2&amp;dtm_source=KK&amp;dtm_detail=gK6v9uUgnqrIuUu1umjUAQ&amp;dtm_campaign=commerce_social_cta2&amp;dtm_medium=OG" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(3)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(3)" title="삭제">🗑</button></td></tr><tr class="row-order"><td style="color:var(--text2);text-align:center">4</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="유량 측정 센서 YF-B1" style="white-space:normal;line-height:1.4;font-size:12px">유량 측정 센서 YF-B1</td><td style="color:var(--text2)">개</td><td class="r">5</td><td class="r">₩15,210</td><td class="r">0</td><td class="r"><strong>₩76,050</strong></td><td class="c"><button class="status-badge s-order" onclick="changeStatus(3,&#39;도착&#39;)" title="클릭해서 변경">🛒 주문완료</button></td><td><a href="https://smartstore.naver.com/jkutong28/products/13363316797?nl-query=%EC%9C%A0%EB%9F%89%20%EC%B8%A1%EC%A0%95%20%EC%84%BC%EC%84%9C&amp;nl-au=f794daf029d24b89852de2698d1ca9b8&amp;NaPm=ci%3Df794daf029d24b89852de2698d1ca9b8%7Cct%3Dmoy169lp%7Ctr%3Dnslsl%7Csn%3D10429634%7Chk%3D26b5a9d3f564daf1f3ec71f5f9c6d743e4128f17" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(4)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(4)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">5</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="5L 말통" style="white-space:normal;line-height:1.4;font-size:12px">5L 말통</td><td style="color:var(--text2)">개</td><td class="r">5</td><td class="r">₩4,700</td><td class="r">₩4,000</td><td class="r"><strong>₩27,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(4,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/plaforyou/products/5169943671?n_media=684927&amp;n_query=%EB%A7%90%ED%86%B5&amp;n_rank=1&amp;n_ad_group=grp-a001-02-000000016122332&amp;n_ad=nad-a001-02-000000109528973&amp;n_campaign_type=2&amp;n_mall_id=ncp_1nyvn0_01&amp;n_mall_pid=5169943671&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy1pbo1%7Cci%3DERe8249c7a%2D4b7b%2D11f1%2D8582%2Dbe5731dd6ced%7Ctr%3Dplan%7Chk%3Dc4ab39c2320dec7dc9cacd9266fc79e470de7fb0%7Cnacn%3D62XZBARrHDXq" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(5)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(5)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">6</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="500mL 주사기" style="white-space:normal;line-height:1.4;font-size:12px">500mL 주사기</td><td style="color:var(--text2)">개</td><td class="r">2</td><td class="r">₩4,950</td><td class="r">₩3,000</td><td class="r"><strong>₩12,900</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(5,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/grandmedi/products/5067359844?NaPm=ct%3Dmorcoxwg%7Cci%3Df0dbf4dca950a3741217c6b3a16d02ec7c31f8b9%7Ctr%3Dslsl%7Csn%3D267936%7Chk%3D56cfed4a9722031807b3ca1935767ef047eb47d2&amp;nl-au=7df106613fa24361a4633562b7d1addc&amp;nl-query=%EB%8C%80%ED%98%95+%EC%A3%BC%EC%82%AC%EA%B8%B0" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(6)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(6)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">7</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="내경 8mm PVC 호스" style="white-space:normal;line-height:1.4;font-size:12px">내경 8mm PVC 호스</td><td style="color:var(--text2)">m</td><td class="r">2</td><td class="r">₩450</td><td class="r">₩3,500</td><td class="r"><strong>₩4,400</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(6,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/wsrnh/products/5174643501?nl-query=%EB%82%B4%EA%B2%BD+8mm+%ED%98%B8%EC%8A%A4&amp;nl-ts-pid=jQJ13sqX6IRssSjPnBd-115315&amp;NaPm=ct%3Dmoy3w000%7Cci%3D0518a637fcdec2491048db5acb30490169ca97dd%7Ctr%3Dsls%7Csn%3D2339262%7Chk%3Dc54c0d33f5b31e163792f0c065628169e10ce60d" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(7)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(7)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">8</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="16mm~8mm 호스 커넥터" style="white-space:normal;line-height:1.4;font-size:12px">16mm~8mm 호스 커넥터</td><td style="color:var(--text2)">개</td><td class="r">6</td><td class="r">₩800</td><td class="r">₩3,500</td><td class="r"><strong>₩8,300</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(7,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/mania42/products/8991695350?nl-query=16mm%208mm%20%EC%BB%A4%EB%84%A5%ED%84%B0&amp;nl-au=ed2129006c82448e804618d8b054c3aa&amp;NaPm=ci%3Ded2129006c82448e804618d8b054c3aa%7Cct%3Dmoy3rj7t%7Ctr%3Dnslsl%7Csn%3D865113%7Chk%3D89510d21b64e10ee3429dc4e172bbccdfadfdd6f" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(8)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(8)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">9</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="350W 12V SMPS" style="white-space:normal;line-height:1.4;font-size:12px">350W 12V SMPS</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩27,300</td><td class="r">₩2,500</td><td class="r"><strong>₩29,800</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(8,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/heewon7082/products/9453371317" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(9)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(9)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">10</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="가든쿡 2구 밸브형 분배기 GW-402" style="white-space:normal;line-height:1.4;font-size:12px">가든쿡 2구 밸브형 분배기 GW-402</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩6,000</td><td class="r">₩3,000</td><td class="r"><strong>₩9,000</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(9,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/zerotool/products/5514164092?n_media=684927&amp;n_query=%ED%98%B8%EC%8A%A4Y%EC%BB%A4%EB%84%A5%ED%84%B016MM&amp;n_rank=2&amp;n_ad_group=grp-a001-02-000000057874661&amp;n_ad=nad-a001-02-000000439771168&amp;n_campaign_type=2&amp;n_mall_id=ncp_1nrkhw_01&amp;n_mall_pid=5514164092&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy48uui%7Cci%3DERd99748e5%2D4b85%2D11f1%2Dad7c%2D5227603a09b8%7Ctr%3Dplan%7Chk%3Dbaea24499bba3c0f5bab728f7e896365bea9b1a6%7Cnacn%3D62XZBARrHDXqq" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(10)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(10)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">11</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="아두이노 메가2560 R3 USB C" style="white-space:normal;line-height:1.4;font-size:12px">아두이노 메가2560 R3 USB C</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩13,990</td><td class="r">₩3,000</td><td class="r"><strong>₩16,990</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(10,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/misoparts/products/11692472696" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(11)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(11)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">12</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="AC 3구 코드 선 1.5M(1.파워 전원케이블 / 1.5M)" style="white-space:normal;line-height:1.4;font-size:12px">AC 3구 코드 선 1.5M(1.파워 전원케이블 / 1.5M)</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩2,900</td><td class="r">₩3,000</td><td class="r"><strong>₩5,900</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(11,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/nlife/products/4948023670?nl-query=%EC%BB%B4%ED%93%A8%ED%84%B0%20%EC%A0%84%EC%9B%90%EC%84%A0&amp;nl-au=64ed5b5d7b1144a0bff041cdb0688944&amp;NaPm=ci%3D64ed5b5d7b1144a0bff041cdb0688944%7Cct%3Dmoy4mbrx%7Ctr%3Dnslsl%7Csn%3D165499%7Chk%3D79827b904b557b1ad58051a4c3fea012456f6f100" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(12)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(12)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">13</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="UL1015 전선 케이블 전기선 AWG18 적색(UL1015 )" style="white-space:normal;line-height:1.4;font-size:12px">UL1015 전선 케이블 전기선 AWG18 적색(UL1015 )</td><td style="color:var(--text2)">m</td><td class="r">15</td><td class="r">₩500</td><td class="r">₩3,000</td><td class="r"><strong>₩10,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(12,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/ctkmall/products/6942294084?n_media=684927&amp;n_query=AWG18&amp;n_rank=1&amp;n_ad_group=grp-a001-02-000000028626403&amp;n_ad=nad-a001-02-000000195575379&amp;n_campaign_type=2&amp;n_mall_id=ionchoi1&amp;n_mall_pid=6942294084&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy4r6hy%7Cci%3DERd727e540%2D4b87%2D11f1%2Daf08%2D0ec2f509580a%7Ctr%3Dplan%7Chk%3D5defdcc1f10fab7eae5126dc474cae329dbffc2d%7Cnacn%3D62XZBARrHDXq" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(13)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(13)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">14</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="실리콘 케이블 전선 AWG 24(블루)" style="white-space:normal;line-height:1.4;font-size:12px">실리콘 케이블 전선 AWG 24(블루)</td><td style="color:var(--text2)">m</td><td class="r">10</td><td class="r">₩290</td><td class="r">₩3,000</td><td class="r"><strong>₩5,900</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(13,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/shipdiy/products/9622489567?n_media=684927&amp;n_query=24AWG%EC%A0%84%EC%84%A0&amp;n_rank=9&amp;n_ad_group=grp-a001-02-000000043200990&amp;n_ad=nad-a001-02-000000309025217&amp;n_campaign_type=2&amp;n_mall_id=carled&amp;n_mall_pid=9622489567&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy4zzbn%7Cci%3DERcbe53eaa%2D4b88%2D11f1%2D8324%2D52562450fb56%7Ctr%3Dplan%7Chk%3Dce50c328efd2ac5a34201af553ba60b2537b2b94%7Cnacn%3D62XZBARrHDXq#REVIEW" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(14)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(14)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">15</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="터보 라이터(일러스트)" style="white-space:normal;line-height:1.4;font-size:12px">터보 라이터(일러스트)</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩400</td><td class="r">₩3,000</td><td class="r"><strong>₩3,400</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(14,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/ygrc/products/12509321316?NaPm=ct%3Dmoy5694g%7Cci%3D6df46d1126f6b48644dbe0b396691c4b86ad7237%7Ctr%3Dslsl%7Csn%3D601532%7Chk%3Dac27b1d14321a23999a1aa4f8a5fd9e27841aedb&amp;nl-au=26f6c26eb2eb49bca8190f665daad021&amp;nl-query=%ED%84%B0%EB%B3%B4+%EB%9D%BC%EC%9D%B4%ED%84%B0+1%EA%B0%9C" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(15)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(15)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">16</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="홈실리콘 튜브형 가정용 실리콘 E-7000 투명 100ml" style="white-space:normal;line-height:1.4;font-size:12px">홈실리콘 튜브형 가정용 실리콘 E-7000 투명 100ml</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩1,850</td><td class="r">₩3,000</td><td class="r"><strong>₩4,850</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(15,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/woozootraders/products/8091236568?n_media=684927&amp;n_query=%ED%8A%9C%EB%B8%8C%ED%98%95%EC%8B%A4%EB%A6%AC%EC%BD%98&amp;n_rank=2&amp;n_ad_group=grp-a001-02-000000058387760&amp;n_ad=nad-a001-02-000000444215242&amp;n_campaign_type=2&amp;n_mall_id=ncp_1ojujf_01&amp;n_mall_pid=8091236568&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy5a59f%7Cci%3DERe692f73c%2D4b89%2D11f1%2Da518%2D6a48b25a4caf%7Ctr%3Dplan%7Chk%3D0fa5179cec21da9631cbc7d5067310b5e1c3cc43%7Cnacn%3D62XZBARrHDXq" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(16)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(16)" title="삭제">🗑</button></td></tr><tr class="row-order"><td style="color:var(--text2);text-align:center">17</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="엑츄에이터(2-8cm 모터 전원 미포함)" style="white-space:normal;line-height:1.4;font-size:12px">엑츄에이터(2-8cm 모터 전원 미포함)</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩22,700</td><td class="r">0</td><td class="r"><strong>₩22,700</strong></td><td class="c"><button class="status-badge s-order" onclick="changeStatus(16,&#39;도착&#39;)" title="클릭해서 변경">🛒 주문완료</button></td><td><a href="https://smartstore.naver.com/ssstars7/products/10544328051?NaPm=ct%3Dmp39l21c%7Cci%3Daba8dc15ae0413b760fd7d3f5a348619f467758e%7Ctr%3Dslsl%7Csn%3D10460624%7Chk%3D9817702d92c7ef6731fdc9d3330e370dcf295f7a&amp;nl-au=cc981dd2471c4a6c90ebaf8d38f04fed&amp;nl-query=%EC%97%91%EC%B6%94%EC%97%90%EC%9D%B4%ED%84%B0" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(17)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(17)" title="삭제">🗑</button></td></tr><tr class="row-arrive"><td style="color:var(--text2);text-align:center">18</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="DC12V 60W 다이아프램 펌프" style="white-space:normal;line-height:1.4;font-size:12px">DC12V 60W 다이아프램 펌프</td><td style="color:var(--text2)">개</td><td class="r">3</td><td class="r">₩18,750</td><td class="r">₩3,000</td><td class="r"><strong>₩59,250</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(17,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/pokhara/products/2525793715?nl-query=12v%20%EC%9B%8C%ED%84%B0%ED%8E%8C%ED%94%84&amp;nl-au=0e67c7c273e640b0b44076ebc91adaa8&amp;NaPm=ci%3D0e67c7c273e640b0b44076ebc91adaa8%7Cct%3Dmp39piuc%7Ctr%3Dnslsl%7Csn%3D390777%7Chk%3D56e1621470fd67da576af257d339c1e7e84a15c1" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(18)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(18)" title="삭제">🗑</button></td></tr><tr class="row-order"><td style="color:var(--text2);text-align:center">19</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="50% Phytic Acid Solution / Practical  Grade / 피트산" style="white-space:normal;line-height:1.4;font-size:12px">50% Phytic Acid Solution / Practical  Grade / 피트산</td><td style="color:var(--text2)">250 g</td><td class="r">1</td><td class="r">₩80,410</td><td class="r">0</td><td class="r"><strong>₩80,410</strong></td><td class="c"><button class="status-badge s-order" onclick="changeStatus(18,&#39;도착&#39;)" title="클릭해서 변경">🛒 주문완료</button></td><td><a href="https://www.dslab.co.kr/shop/item.php?it_id=0060-00012" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(19)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(19)" title="삭제">🗑</button></td></tr><tr class="row-order"><td style="color:var(--text2);text-align:center">20</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="Lignin (Alkaline)" style="white-space:normal;line-height:1.4;font-size:12px">Lignin (Alkaline)</td><td style="color:var(--text2)">500 g</td><td class="r">1</td><td class="r">₩77,121</td><td class="r">0</td><td class="r"><strong>₩77,121</strong></td><td class="c"><button class="status-badge s-order" onclick="changeStatus(19,&#39;도착&#39;)" title="클릭해서 변경">🛒 주문완료</button></td><td><a href="https://www.ebricmall.com/product/productDetail/298797" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(20)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(20)" title="삭제">🗑</button></td></tr></tbody>
+      </table>
+    </div>
+    <div class="empty-msg" id="emptyMsg" style="display: none;">
+      📭<br>항목이 없습니다.<br>
+      항목 추가 탭에서 등록하거나 <strong>새로고침</strong>을 눌러주세요.
+    </div>
+  </div>
+
+  <!-- 항목 추가 -->
+  <div class="sec" id="sec-add">
+    <div class="form-card">
+      <h3>✏️ 신규 주문 항목 입력</h3>
+      <div class="f3">
+        <div class="frow"><label>담당교사 *</label>
+          <select id="a_teacher">
+            <option value="">선택하세요</option>
+            <option value="김원우">김원우</option>
+            <option value="김태현">김태현</option>
+            <option value="박준원">박준원</option>
+            <option value="이대석">이대석</option>
+          </select>
+        </div>
+        <div class="frow"><label>동아리명(발명관련) *</label><input id="a_club" placeholder="예: 에너지 환경 탐구"></div>
+        <div class="frow"><label>활동명 간단 *</label><input id="a_activity" placeholder="예: 발명교육"></div>
+      </div>
+      <div class="f2">
+        <div class="frow"><label>품명 *</label><input id="a_product" placeholder="예: 내경 16mm PVC 호스"></div>
+        <div class="frow"><label>규격</label><input id="a_spec" placeholder="예: m, 개, 250g"></div>
+      </div>
+      <div class="f3">
+        <div class="frow"><label>수량 *</label><input type="number" id="a_qty" placeholder="1" min="1" value="1" oninput="calcPrev()"></div>
+        <div class="frow"><label>예산단가 (원) *</label><input type="number" id="a_price" placeholder="0" min="0" oninput="calcPrev()"></div>
+        <div class="frow"><label>배송비 (원)</label><input type="number" id="a_ship" placeholder="0" min="0" value="0" oninput="calcPrev()"></div>
+      </div>
+      <div class="frow"><label>구매처/사이트 URL</label><input id="a_url" placeholder="https://smartstore.naver.com/..."></div>
+      <div class="frow"><label>메모</label><textarea id="a_memo" placeholder="특이사항 등"></textarea></div>
+      <div class="form-footer">
+        <span style="font-size:12px;color:var(--text2)">예상금액: <strong id="prevAmt" style="color:var(--text)">₩0</strong></span>
+        <button class="btn btn-blue" onclick="addItem()">➕ 항목 추가</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 미처리 -->
+  <div class="sec" id="sec-status-none">
+    <div class="sum-bar" id="sumBarNone"><div class="sum-card"><div class="lbl">⏳ 미처리</div><div class="val blue">0건</div></div><div class="sum-card"><div class="lbl">💰 예상 총액</div><div class="val" style="color:var(--red)">₩0</div></div></div>
+    <div class="tbl-wrap">
+      <table>
+        <colgroup>
+          <col style="width:36px"><col style="width:68px"><col style="width:100px"><col style="width:72px">
+          <col style="width:190px"><col style="width:46px"><col style="width:44px">
+          <col style="width:76px"><col style="width:58px"><col style="width:78px">
+          <col style="width:88px"><col style="width:130px"><col style="width:60px">
+        </colgroup>
+        <thead><tr>
+          <th>순번</th><th>담당교사</th><th>동아리명</th><th>활동명<br><span style="font-weight:400">간단</span></th>
+          <th>품명</th><th>규격</th><th class="r">수량</th>
+          <th class="r">예산단가</th><th class="r">배송비</th><th class="r">예상금액</th>
+          <th class="c">상태</th><th>구매처/사이트</th><th class="c">관리</th>
+        </tr></thead>
+        <tbody id="tBodyNone"></tbody>
+      </table>
+    </div>
+    <div class="empty-msg" id="emptyNone" style="display: block; text-align: center; padding: 3rem; color: var(--text2);">
+      ✅ 미처리 항목이 없어요!
+    </div>
+  </div>
+
+  <!-- 주문완료 -->
+  <div class="sec" id="sec-status-order">
+    <div class="sum-bar" id="sumBarOrder"><div class="sum-card"><div class="lbl">🛒 주문완료</div><div class="val blue">4건</div></div><div class="sum-card"><div class="lbl">💰 예상 총액</div><div class="val" style="color:var(--red)">₩256,281</div></div></div>
+    <div class="tbl-wrap">
+      <table>
+        <colgroup>
+          <col style="width:36px"><col style="width:68px"><col style="width:100px"><col style="width:72px">
+          <col style="width:190px"><col style="width:46px"><col style="width:44px">
+          <col style="width:76px"><col style="width:58px"><col style="width:78px">
+          <col style="width:88px"><col style="width:130px"><col style="width:60px">
+        </colgroup>
+        <thead><tr>
+          <th>순번</th><th>담당교사</th><th>동아리명</th><th>활동명<br><span style="font-weight:400">간단</span></th>
+          <th>품명</th><th>규격</th><th class="r">수량</th>
+          <th class="r">예산단가</th><th class="r">배송비</th><th class="r">예상금액</th>
+          <th class="c">상태</th><th>구매처/사이트</th><th class="c">관리</th>
+        </tr></thead>
+        <tbody id="tBodyOrder"><tr><td style="color:var(--text2);text-align:center">1</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="유량 측정 센서 YF-B1" style="white-space:normal;line-height:1.4;font-size:12px">유량 측정 센서 YF-B1</td><td style="color:var(--text2)">개</td><td class="r">5</td><td class="r">₩15,210</td><td class="r">0</td><td class="r"><strong>₩76,050</strong></td><td class="c"><button class="status-badge s-order" onclick="changeStatus(3,&#39;도착&#39;)" title="클릭해서 변경">🛒 주문완료</button></td><td><a href="https://smartstore.naver.com/jkutong28/products/13363316797?nl-query=%EC%9C%A0%EB%9F%89%20%EC%B8%A1%EC%A0%95%20%EC%84%BC%EC%84%9C&amp;nl-au=f794daf029d24b89852de2698d1ca9b8&amp;NaPm=ci%3Df794daf029d24b89852de2698d1ca9b8%7Cct%3Dmoy169lp%7Ctr%3Dnslsl%7Csn%3D10429634%7Chk%3D26b5a9d3f564daf1f3ec71f5f9c6d743e4128f17" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(4)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(4)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">2</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="엑츄에이터(2-8cm 모터 전원 미포함)" style="white-space:normal;line-height:1.4;font-size:12px">엑츄에이터(2-8cm 모터 전원 미포함)</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩22,700</td><td class="r">0</td><td class="r"><strong>₩22,700</strong></td><td class="c"><button class="status-badge s-order" onclick="changeStatus(16,&#39;도착&#39;)" title="클릭해서 변경">🛒 주문완료</button></td><td><a href="https://smartstore.naver.com/ssstars7/products/10544328051?NaPm=ct%3Dmp39l21c%7Cci%3Daba8dc15ae0413b760fd7d3f5a348619f467758e%7Ctr%3Dslsl%7Csn%3D10460624%7Chk%3D9817702d92c7ef6731fdc9d3330e370dcf295f7a&amp;nl-au=cc981dd2471c4a6c90ebaf8d38f04fed&amp;nl-query=%EC%97%91%EC%B6%94%EC%97%90%EC%9D%B4%ED%84%B0" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(17)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(17)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">3</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="50% Phytic Acid Solution / Practical  Grade / 피트산" style="white-space:normal;line-height:1.4;font-size:12px">50% Phytic Acid Solution / Practical  Grade / 피트산</td><td style="color:var(--text2)">250 g</td><td class="r">1</td><td class="r">₩80,410</td><td class="r">0</td><td class="r"><strong>₩80,410</strong></td><td class="c"><button class="status-badge s-order" onclick="changeStatus(18,&#39;도착&#39;)" title="클릭해서 변경">🛒 주문완료</button></td><td><a href="https://www.dslab.co.kr/shop/item.php?it_id=0060-00012" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(19)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(19)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">4</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="Lignin (Alkaline)" style="white-space:normal;line-height:1.4;font-size:12px">Lignin (Alkaline)</td><td style="color:var(--text2)">500 g</td><td class="r">1</td><td class="r">₩77,121</td><td class="r">0</td><td class="r"><strong>₩77,121</strong></td><td class="c"><button class="status-badge s-order" onclick="changeStatus(19,&#39;도착&#39;)" title="클릭해서 변경">🛒 주문완료</button></td><td><a href="https://www.ebricmall.com/product/productDetail/298797" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(20)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(20)" title="삭제">🗑</button></td></tr></tbody>
+      </table>
+    </div>
+    <div class="empty-msg" id="emptyOrder" style="display:none;text-align:center;padding:3rem;color:var(--text2)">
+      🛒 주문완료 항목이 없어요.
+    </div>
+  </div>
+
+  <!-- 도착 -->
+  <div class="sec" id="sec-status-arrive">
+    <div class="sum-bar" id="sumBarArrive"><div class="sum-card"><div class="lbl">✅ 도착</div><div class="val blue">16건</div></div><div class="sum-card"><div class="lbl">💰 예상 총액</div><div class="val" style="color:var(--red)">₩259,190</div></div></div>
+    <div class="tbl-wrap">
+      <table>
+        <colgroup>
+          <col style="width:36px"><col style="width:68px"><col style="width:100px"><col style="width:72px">
+          <col style="width:190px"><col style="width:46px"><col style="width:44px">
+          <col style="width:76px"><col style="width:58px"><col style="width:78px">
+          <col style="width:88px"><col style="width:130px"><col style="width:60px">
+        </colgroup>
+        <thead><tr>
+          <th>순번</th><th>담당교사</th><th>동아리명</th><th>활동명<br><span style="font-weight:400">간단</span></th>
+          <th>품명</th><th>규격</th><th class="r">수량</th>
+          <th class="r">예산단가</th><th class="r">배송비</th><th class="r">예상금액</th>
+          <th class="c">상태</th><th>구매처/사이트</th><th class="c">관리</th>
+        </tr></thead>
+        <tbody id="tBodyArrive"><tr><td style="color:var(--text2);text-align:center">1</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="내경 16mm PVC 호스" style="white-space:normal;line-height:1.4;font-size:12px">내경 16mm PVC 호스</td><td style="color:var(--text2)">m</td><td class="r">20</td><td class="r">₩1,000</td><td class="r">₩2,500</td><td class="r"><strong>₩22,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(0,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/sejongflexshop/products/11385962441?NaPm=ct%3Dmorf7o3s%7Cci%3D6f7a51221c96f53f97a2055f19cae6d71e7cb374%7Ctr%3Dslsl%7Csn%3D1032469%7Chk%3D94464d10c927e36a3319dea1a5cbe5b33dfb8d34&amp;nl-au=bce3f975e47b4f4490248bc6ec03559c&amp;nl-query=%EB%82%B4%EA%B2%BD+16mm+%ED%98%B8%EC%8A%A4#REVIEW" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(1)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(1)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">2</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="나사선 변환 커넥터" style="white-space:normal;line-height:1.4;font-size:12px">나사선 변환 커넥터</td><td style="color:var(--text2)">개</td><td class="r">15</td><td class="r">₩1,840</td><td class="r">₩1,900</td><td class="r"><strong>₩29,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(1,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/damoagwansu/products/9973183476?is_retargeting=true&amp;c=260101_p_Naver_product&amp;pid=Naver&amp;deep_link_value=https%3A%2F%2Fsmartstore.naver.com%2Fdamoagwansu%2Fproducts%2F9973183476%3Fka_ref%3Dkakao%26ka_req_id%3DgK6xKB__7LuyrI_D6-j4AQ%26ka_template%3Dcommerce_social_cta2&amp;dtm_source=KK&amp;dtm_detail=gK6xKB__7LuyrI_D6-j4AQ&amp;dtm_campaign=commerce_social_cta2&amp;dtm_medium=OG" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(2)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(2)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">3</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="암나사탭연결구(07번)" style="white-space:normal;line-height:1.4;font-size:12px">암나사탭연결구(07번)</td><td style="color:var(--text2)">개</td><td class="r">15</td><td class="r">₩440</td><td class="r">₩1,900</td><td class="r"><strong>₩8,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(2,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/damoagwansu/products/7862674566?is_retargeting=true&amp;c=260101_p_Naver_product&amp;pid=Naver&amp;deep_link_value=https%3A%2F%2Fsmartstore.naver.com%2Fdamoagwansu%2Fproducts%2F7862674566%3Fka_ref%3Dkakao%26ka_req_id%3DgK6v9uUgnqrIuUu1umjUAQ%26ka_template%3Dcommerce_social_cta2&amp;dtm_source=KK&amp;dtm_detail=gK6v9uUgnqrIuUu1umjUAQ&amp;dtm_campaign=commerce_social_cta2&amp;dtm_medium=OG" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(3)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(3)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">4</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="5L 말통" style="white-space:normal;line-height:1.4;font-size:12px">5L 말통</td><td style="color:var(--text2)">개</td><td class="r">5</td><td class="r">₩4,700</td><td class="r">₩4,000</td><td class="r"><strong>₩27,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(4,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/plaforyou/products/5169943671?n_media=684927&amp;n_query=%EB%A7%90%ED%86%B5&amp;n_rank=1&amp;n_ad_group=grp-a001-02-000000016122332&amp;n_ad=nad-a001-02-000000109528973&amp;n_campaign_type=2&amp;n_mall_id=ncp_1nyvn0_01&amp;n_mall_pid=5169943671&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy1pbo1%7Cci%3DERe8249c7a%2D4b7b%2D11f1%2D8582%2Dbe5731dd6ced%7Ctr%3Dplan%7Chk%3Dc4ab39c2320dec7dc9cacd9266fc79e470de7fb0%7Cnacn%3D62XZBARrHDXq" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(5)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(5)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">5</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="500mL 주사기" style="white-space:normal;line-height:1.4;font-size:12px">500mL 주사기</td><td style="color:var(--text2)">개</td><td class="r">2</td><td class="r">₩4,950</td><td class="r">₩3,000</td><td class="r"><strong>₩12,900</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(5,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/grandmedi/products/5067359844?NaPm=ct%3Dmorcoxwg%7Cci%3Df0dbf4dca950a3741217c6b3a16d02ec7c31f8b9%7Ctr%3Dslsl%7Csn%3D267936%7Chk%3D56cfed4a9722031807b3ca1935767ef047eb47d2&amp;nl-au=7df106613fa24361a4633562b7d1addc&amp;nl-query=%EB%8C%80%ED%98%95+%EC%A3%BC%EC%82%AC%EA%B8%B0" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(6)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(6)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">6</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="내경 8mm PVC 호스" style="white-space:normal;line-height:1.4;font-size:12px">내경 8mm PVC 호스</td><td style="color:var(--text2)">m</td><td class="r">2</td><td class="r">₩450</td><td class="r">₩3,500</td><td class="r"><strong>₩4,400</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(6,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/wsrnh/products/5174643501?nl-query=%EB%82%B4%EA%B2%BD+8mm+%ED%98%B8%EC%8A%A4&amp;nl-ts-pid=jQJ13sqX6IRssSjPnBd-115315&amp;NaPm=ct%3Dmoy3w000%7Cci%3D0518a637fcdec2491048db5acb30490169ca97dd%7Ctr%3Dsls%7Csn%3D2339262%7Chk%3Dc54c0d33f5b31e163792f0c065628169e10ce60d" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(7)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(7)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">7</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="16mm~8mm 호스 커넥터" style="white-space:normal;line-height:1.4;font-size:12px">16mm~8mm 호스 커넥터</td><td style="color:var(--text2)">개</td><td class="r">6</td><td class="r">₩800</td><td class="r">₩3,500</td><td class="r"><strong>₩8,300</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(7,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/mania42/products/8991695350?nl-query=16mm%208mm%20%EC%BB%A4%EB%84%A5%ED%84%B0&amp;nl-au=ed2129006c82448e804618d8b054c3aa&amp;NaPm=ci%3Ded2129006c82448e804618d8b054c3aa%7Cct%3Dmoy3rj7t%7Ctr%3Dnslsl%7Csn%3D865113%7Chk%3D89510d21b64e10ee3429dc4e172bbccdfadfdd6f" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(8)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(8)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">8</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="350W 12V SMPS" style="white-space:normal;line-height:1.4;font-size:12px">350W 12V SMPS</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩27,300</td><td class="r">₩2,500</td><td class="r"><strong>₩29,800</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(8,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/heewon7082/products/9453371317" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(9)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(9)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">9</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="가든쿡 2구 밸브형 분배기 GW-402" style="white-space:normal;line-height:1.4;font-size:12px">가든쿡 2구 밸브형 분배기 GW-402</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩6,000</td><td class="r">₩3,000</td><td class="r"><strong>₩9,000</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(9,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/zerotool/products/5514164092?n_media=684927&amp;n_query=%ED%98%B8%EC%8A%A4Y%EC%BB%A4%EB%84%A5%ED%84%B016MM&amp;n_rank=2&amp;n_ad_group=grp-a001-02-000000057874661&amp;n_ad=nad-a001-02-000000439771168&amp;n_campaign_type=2&amp;n_mall_id=ncp_1nrkhw_01&amp;n_mall_pid=5514164092&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy48uui%7Cci%3DERd99748e5%2D4b85%2D11f1%2Dad7c%2D5227603a09b8%7Ctr%3Dplan%7Chk%3Dbaea24499bba3c0f5bab728f7e896365bea9b1a6%7Cnacn%3D62XZBARrHDXqq" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(10)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(10)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">10</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="아두이노 메가2560 R3 USB C" style="white-space:normal;line-height:1.4;font-size:12px">아두이노 메가2560 R3 USB C</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩13,990</td><td class="r">₩3,000</td><td class="r"><strong>₩16,990</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(10,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/misoparts/products/11692472696" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(11)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(11)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">11</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="AC 3구 코드 선 1.5M(1.파워 전원케이블 / 1.5M)" style="white-space:normal;line-height:1.4;font-size:12px">AC 3구 코드 선 1.5M(1.파워 전원케이블 / 1.5M)</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩2,900</td><td class="r">₩3,000</td><td class="r"><strong>₩5,900</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(11,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/nlife/products/4948023670?nl-query=%EC%BB%B4%ED%93%A8%ED%84%B0%20%EC%A0%84%EC%9B%90%EC%84%A0&amp;nl-au=64ed5b5d7b1144a0bff041cdb0688944&amp;NaPm=ci%3D64ed5b5d7b1144a0bff041cdb0688944%7Cct%3Dmoy4mbrx%7Ctr%3Dnslsl%7Csn%3D165499%7Chk%3D79827b904b557b1ad58051a4c3fea012456f6f100" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(12)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(12)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">12</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="UL1015 전선 케이블 전기선 AWG18 적색(UL1015 )" style="white-space:normal;line-height:1.4;font-size:12px">UL1015 전선 케이블 전기선 AWG18 적색(UL1015 )</td><td style="color:var(--text2)">m</td><td class="r">15</td><td class="r">₩500</td><td class="r">₩3,000</td><td class="r"><strong>₩10,500</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(12,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/ctkmall/products/6942294084?n_media=684927&amp;n_query=AWG18&amp;n_rank=1&amp;n_ad_group=grp-a001-02-000000028626403&amp;n_ad=nad-a001-02-000000195575379&amp;n_campaign_type=2&amp;n_mall_id=ionchoi1&amp;n_mall_pid=6942294084&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy4r6hy%7Cci%3DERd727e540%2D4b87%2D11f1%2Daf08%2D0ec2f509580a%7Ctr%3Dplan%7Chk%3D5defdcc1f10fab7eae5126dc474cae329dbffc2d%7Cnacn%3D62XZBARrHDXq" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(13)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(13)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">13</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="실리콘 케이블 전선 AWG 24(블루)" style="white-space:normal;line-height:1.4;font-size:12px">실리콘 케이블 전선 AWG 24(블루)</td><td style="color:var(--text2)">m</td><td class="r">10</td><td class="r">₩290</td><td class="r">₩3,000</td><td class="r"><strong>₩5,900</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(13,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/shipdiy/products/9622489567?n_media=684927&amp;n_query=24AWG%EC%A0%84%EC%84%A0&amp;n_rank=9&amp;n_ad_group=grp-a001-02-000000043200990&amp;n_ad=nad-a001-02-000000309025217&amp;n_campaign_type=2&amp;n_mall_id=carled&amp;n_mall_pid=9622489567&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy4zzbn%7Cci%3DERcbe53eaa%2D4b88%2D11f1%2D8324%2D52562450fb56%7Ctr%3Dplan%7Chk%3Dce50c328efd2ac5a34201af553ba60b2537b2b94%7Cnacn%3D62XZBARrHDXq#REVIEW" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(14)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(14)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">14</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="터보 라이터(일러스트)" style="white-space:normal;line-height:1.4;font-size:12px">터보 라이터(일러스트)</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩400</td><td class="r">₩3,000</td><td class="r"><strong>₩3,400</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(14,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/ygrc/products/12509321316?NaPm=ct%3Dmoy5694g%7Cci%3D6df46d1126f6b48644dbe0b396691c4b86ad7237%7Ctr%3Dslsl%7Csn%3D601532%7Chk%3Dac27b1d14321a23999a1aa4f8a5fd9e27841aedb&amp;nl-au=26f6c26eb2eb49bca8190f665daad021&amp;nl-query=%ED%84%B0%EB%B3%B4+%EB%9D%BC%EC%9D%B4%ED%84%B0+1%EA%B0%9C" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(15)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(15)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">15</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="홈실리콘 튜브형 가정용 실리콘 E-7000 투명 100ml" style="white-space:normal;line-height:1.4;font-size:12px">홈실리콘 튜브형 가정용 실리콘 E-7000 투명 100ml</td><td style="color:var(--text2)">개</td><td class="r">1</td><td class="r">₩1,850</td><td class="r">₩3,000</td><td class="r"><strong>₩4,850</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(15,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/woozootraders/products/8091236568?n_media=684927&amp;n_query=%ED%8A%9C%EB%B8%8C%ED%98%95%EC%8B%A4%EB%A6%AC%EC%BD%98&amp;n_rank=2&amp;n_ad_group=grp-a001-02-000000058387760&amp;n_ad=nad-a001-02-000000444215242&amp;n_campaign_type=2&amp;n_mall_id=ncp_1ojujf_01&amp;n_mall_pid=8091236568&amp;n_ad_group_type=2&amp;n_match=3&amp;NaPm=ct%3Dmoy5a59f%7Cci%3DERe692f73c%2D4b89%2D11f1%2Da518%2D6a48b25a4caf%7Ctr%3Dplan%7Chk%3D0fa5179cec21da9631cbc7d5067310b5e1c3cc43%7Cnacn%3D62XZBARrHDXq" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(16)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(16)" title="삭제">🗑</button></td></tr><tr><td style="color:var(--text2);text-align:center">16</td><td>김태현</td><td style="white-space:normal;line-height:1.4;font-size:11px">에너지 환경 탐구</td><td style="font-size:11px">발명교육</td><td title="DC12V 60W 다이아프램 펌프" style="white-space:normal;line-height:1.4;font-size:12px">DC12V 60W 다이아프램 펌프</td><td style="color:var(--text2)">개</td><td class="r">3</td><td class="r">₩18,750</td><td class="r">₩3,000</td><td class="r"><strong>₩59,250</strong></td><td class="c"><button class="status-badge s-arrive" onclick="changeStatus(17,&#39;-&#39;)" title="클릭해서 변경">✅ 도착</button></td><td><a href="https://smartstore.naver.com/pokhara/products/2525793715?nl-query=12v%20%EC%9B%8C%ED%84%B0%ED%8E%8C%ED%94%84&amp;nl-au=0e67c7c273e640b0b44076ebc91adaa8&amp;NaPm=ci%3D0e67c7c273e640b0b44076ebc91adaa8%7Cct%3Dmp39piuc%7Ctr%3Dnslsl%7Csn%3D390777%7Chk%3D56e1621470fd67da576af257d339c1e7e84a15c1" target="_blank" style="font-size:11px">🔗 링크</a></td><td class="c" style="white-space:nowrap"><button class="btn btn-sm" onclick="openM(18)" title="수정">✏️</button> <button class="btn btn-sm btn-red" onclick="delItem(18)" title="삭제">🗑</button></td></tr></tbody>
+      </table>
+    </div>
+    <div class="empty-msg" id="emptyArrive" style="display:none;text-align:center;padding:3rem;color:var(--text2)">
+      📦 도착한 항목이 없어요.
+    </div>
+  </div>
+
+  </div><!-- end layout -->
+
+  <!-- 수정 모달 -->
+  <div class="modal-overlay" id="mWrap">
+    <div class="modal">
+      <h3>✏️ 항목 수정</h3>
+      <input type="hidden" id="m_id">
+      <div class="f3">
+        <div class="frow"><label>담당교사</label>
+          <select id="m_teacher">
+            <option value="">선택하세요</option>
+            <option value="김원우">김원우</option>
+            <option value="김태현">김태현</option>
+            <option value="박준원">박준원</option>
+            <option value="이대석">이대석</option>
+          </select>
+        </div>
+        <div class="frow"><label>동아리명</label><input id="m_club"></div>
+        <div class="frow"><label>활동명</label><input id="m_activity"></div>
+      </div>
+      <div class="f2">
+        <div class="frow"><label>품명</label><input id="m_product"></div>
+        <div class="frow"><label>규격</label><input id="m_spec"></div>
+      </div>
+      <div class="f3">
+        <div class="frow"><label>수량</label><input type="number" id="m_qty" min="1"></div>
+        <div class="frow"><label>예산단가</label><input type="number" id="m_price" min="0"></div>
+        <div class="frow"><label>배송비</label><input type="number" id="m_ship" min="0"></div>
+      </div>
+      <div class="frow"><label>구매처/사이트</label><input id="m_url"></div>
+      <div class="frow"><label>메모</label><textarea id="m_memo"></textarea></div>
+      <div class="mfooter">
+        <button class="btn" onclick="closeM()">취소</button>
+        <button class="btn btn-blue" onclick="saveM()">저장</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast show" id="toast">✅ 20건 불러오기 완료</div>
+
+<script>
+// ════════════════════════════════════════════════
+//  Apps Script 배포 URL
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxOZpRB6ReF-nBf7yMPUDTBpaI4tnj9Bm3o3PuEwytYGa970gl_HcXBRFI2NME2N_IDZg/exec';
+// ════════════════════════════════════════════════
+
+let items = [];
+let nid = 1;
+
+// ── 토스트 알림 ──────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2500);
+}
+
+// ── 숫자 포맷 ────────────────────────────────────
+function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
+
+// ── 시트에서 불러오기 (fetch) ─────────────────────
+async function loadFromSheet() {
+  const btn = document.getElementById('btnLoad');
+  btn.disabled = true;
+  btn.textContent = '불러오는 중...';
+  try {
+    const res = await fetch(GAS_URL);
+    const data = await res.json();
+    if (data && data.success && Array.isArray(data.items)) {
+      items = data.items;
+      nid = items.length + 1;
+      render();
+      toast('✅ ' + items.length + '건 불러오기 완료');
+    } else {
+      toast('❌ 불러오기 실패: ' + (data.error || '오류'));
+    }
+  } catch(e) {
+    toast('❌ 오류: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '↻ 새로고침';
+    if (typeof startCountdown === 'function') startCountdown();
+  }
+}
+
+// ── GET 쿼리스트링 방식으로 데이터 전송 (file:// 완벽 호환) ─────────
+function gasPost(payload) {
+  const json = encodeURIComponent(JSON.stringify(payload));
+  const url = GAS_URL + '?action_data=' + json;
+  // 응답 읽기 불필요 - no-cors fetch로 전송
+  fetch(url, { mode: 'no-cors' }).catch(function(){});
+}
+
+// ── 요약 카드 ────────────────────────────────────
+function renderSummary() {
+  const total   = items.reduce(function(s,o){ return s + o.qty * o.price + o.ship; }, 0);
+  const arrive  = items.filter(function(o){ return o.status === '도착'; }).length;
+  const ordered = items.filter(function(o){ return o.status === '주문완료'; }).length;
+  const none    = items.filter(function(o){ return o.status === '-'; }).length;
+  document.getElementById('sumBar').innerHTML =
+    '<div class="sum-card" style="border-top:3px solid #1a73e8"><div class="lbl">📋 전체 항목</div><div class="val blue">' + items.length + '건</div></div>' +
+    '<div class="sum-card" style="border-top:3px solid #9aa0a6"><div class="lbl">⏳ 미처리</div><div class="val" style="color:#5f6368">' + none + '건</div></div>' +
+    '<div class="sum-card" style="border-top:3px solid #1a73e8"><div class="lbl">🛒 주문완료</div><div class="val" style="color:#1a73e8">' + ordered + '건</div></div>' +
+    '<div class="sum-card" style="border-top:3px solid #34a853"><div class="lbl">✅ 도착</div><div class="val green">' + arrive + '건</div></div>' +
+    '<div class="sum-card" style="border-top:3px solid #ea4335"><div class="lbl">💰 예상 총액</div><div class="val" style="color:#ea4335">₩' + fmt(total) + '</div></div>';
+}
+
+// ── 필터 옵션 ────────────────────────────────────
+function populateFilters() {
+  function setOpts(id, arr, label) {
+    var el = document.getElementById(id); var v = el.value;
+    el.innerHTML = '<option value="">' + label + '</option>' +
+      arr.map(function(a){ return '<option value="' + a + '">' + a + '</option>'; }).join('');
+    el.value = v;
+  }
+  setOpts('fTeacher', [...new Set(items.map(function(o){ return o.teacher; }))], '전체 담당교사');
+  setOpts('fClub',    [...new Set(items.map(function(o){ return o.club; }))],    '전체 동아리');
+}
+
+// ── 테이블 렌더링 ─────────────────────────────────
+function render() {
+  var q  = document.getElementById('srch').value.toLowerCase();
+  var ft = document.getElementById('fTeacher').value;
+  var fc = document.getElementById('fClub').value;
+  var fs = '';
+  var filtered = items.filter(function(o) {
+    return (!q  || o.product.toLowerCase().includes(q) || o.teacher.toLowerCase().includes(q) || o.club.toLowerCase().includes(q)) &&
+           (!ft || o.teacher === ft) && (!fc || o.club === fc) && (!fs || o.status === fs);
+  });
+  var tbody = document.getElementById('tBody');
+  var empty = document.getElementById('emptyMsg');
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map(function(o, i) {
+      var gIdx = items.indexOf(o);
+      var amt  = o.qty * o.price + o.ship;
+      var urlCell = o.url
+        ? '<a href="' + o.url + '" target="_blank" style="font-size:11px">🔗 링크</a>'
+        : '<span style="color:var(--text3)">-</span>';
+      var opts =
+        '<option value="-"'        + (o.status==='-'        ?' selected':'') + '>-</option>' +
+        '<option value="주문완료"' + (o.status==='주문완료' ?' selected':'') + '>주문완료</option>' +
+        '<option value="도착"'     + (o.status==='도착'     ?' selected':'') + '>도착</option>';
+      var rowClass = o.status === '주문완료' ? 'row-order' : o.status === '도착' ? 'row-arrive' : '';
+      return '<tr class="' + rowClass + '">' +
+        '<td style="color:var(--text2);text-align:center">' + (i+1) + '</td>' +
+        '<td>' + o.teacher + '</td>' +
+        '<td style="white-space:normal;line-height:1.4;font-size:11px">' + o.club + '</td>' +
+        '<td style="font-size:11px">' + o.activity + '</td>' +
+        '<td title="' + o.product + '" style="white-space:normal;line-height:1.4;font-size:12px">' + o.product + '</td>' +
+        '<td style="color:var(--text2)">' + (o.spec||'') + '</td>' +
+        '<td class="r">' + fmt(o.qty) + '</td>' +
+        '<td class="r">₩' + fmt(o.price) + '</td>' +
+        '<td class="r">' + (o.ship > 0 ? '₩' + fmt(o.ship) : '0') + '</td>' +
+        '<td class="r"><strong>₩' + fmt(amt) + '</strong></td>' +
+        '<td class="c">' + statusBadge(o.status, gIdx) + '</td>' +
+        '<td>' + urlCell + '</td>' +
+        '<td class="c" style="white-space:nowrap">' +
+          '<button class="btn btn-sm" onclick="openM(' + o.id + ')" title="수정">✏️</button> ' +
+          '<button class="btn btn-sm btn-red" onclick="delItem(' + o.id + ')" title="삭제">🗑</button>' +
+        '</td></tr>';
+    }).join('');
+  }
+  renderSummary();
+  populateFilters();
+  updateNavBadges();
+}
+
+// ── 상태 변경 ────────────────────────────────────
+function statusBadge(status, idx) {
+  var cls = status === '주문완료' ? 's-order' : status === '도착' ? 's-arrive' : 's-none';
+  var next = status === '-' ? '주문완료' : status === '주문완료' ? '도착' : '-';
+  var label = status === '-' ? '— 미처리' : status === '주문완료' ? '🛒 주문완료' : '✅ 도착';
+  return '<button class="status-badge ' + cls + '" onclick="changeStatus(' + idx + ',\'' + next + '\')" title="클릭해서 변경">' + label + '</button>';
+}
+
+function renderStatusTable(type) {
+  var statusMap = { none: '-', order: '주문완료', arrive: '도착' };
+  var status = statusMap[type];
+  var filtered = items.filter(function(o){ return o.status === status; });
+  var tbody = document.getElementById('tBody' + type.charAt(0).toUpperCase() + type.slice(1));
+  var empty = document.getElementById('empty' + type.charAt(0).toUpperCase() + type.slice(1));
+  var sumBar = document.getElementById('sumBar' + type.charAt(0).toUpperCase() + type.slice(1));
+
+  var total = filtered.reduce(function(s,o){ return s + o.qty * o.price + o.ship; }, 0);
+  var icons = { none:'⏳', order:'🛒', arrive:'✅' };
+  var labels = { none:'미처리', order:'주문완료', arrive:'도착' };
+  sumBar.innerHTML =
+    '<div class="sum-card"><div class="lbl">' + icons[type] + ' ' + labels[type] + '</div><div class="val blue">' + filtered.length + '건</div></div>' +
+    '<div class="sum-card"><div class="lbl">💰 예상 총액</div><div class="val" style="color:var(--red)">₩' + fmt(total) + '</div></div>';
+
+  if (!filtered.length) {
+    if (tbody) tbody.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  if (tbody) tbody.innerHTML = filtered.map(function(o, i) {
+    var gIdx = items.indexOf(o);
+    var amt = o.qty * o.price + o.ship;
+    var urlCell = o.url
+      ? '<a href="' + o.url + '" target="_blank" style="font-size:11px">🔗 링크</a>'
+      : '<span style="color:var(--text3)">-</span>';
+    return '<tr>' +
+      '<td style="color:var(--text2);text-align:center">' + (i+1) + '</td>' +
+      '<td>' + o.teacher + '</td>' +
+      '<td style="white-space:normal;line-height:1.4;font-size:11px">' + o.club + '</td>' +
+      '<td style="font-size:11px">' + o.activity + '</td>' +
+      '<td title="' + o.product + '" style="white-space:normal;line-height:1.4;font-size:12px">' + o.product + '</td>' +
+      '<td style="color:var(--text2)">' + (o.spec||'') + '</td>' +
+      '<td class="r">' + fmt(o.qty) + '</td>' +
+      '<td class="r">₩' + fmt(o.price) + '</td>' +
+      '<td class="r">' + (o.ship > 0 ? '₩' + fmt(o.ship) : '0') + '</td>' +
+      '<td class="r"><strong>₩' + fmt(amt) + '</strong></td>' +
+      '<td class="c">' + statusBadge(o.status, gIdx) + '</td>' +
+      '<td>' + urlCell + '</td>' +
+      '<td class="c" style="white-space:nowrap">' +
+        '<button class="btn btn-sm" onclick="openM(' + o.id + ')" title="수정">✏️</button> ' +
+        '<button class="btn btn-sm btn-red" onclick="delItem(' + o.id + ')" title="삭제">🗑</button>' +
+      '</td></tr>';
+  }).join('');
+}
+
+function updateNavBadges() {
+  var none   = items.filter(function(o){ return o.status === '-'; }).length;
+  var order  = items.filter(function(o){ return o.status === '주문완료'; }).length;
+  var arrive = items.filter(function(o){ return o.status === '도착'; }).length;
+  var bNone  = document.getElementById('badge-none');
+  var bOrder = document.getElementById('badge-order');
+  var bArrive= document.getElementById('badge-arrive');
+  if (bNone)   bNone.textContent   = none;
+  if (bOrder)  bOrder.textContent  = order;
+  if (bArrive) bArrive.textContent = arrive;
+}
+
+function changeStatus(idx, val) {
+  items[idx].status = val;
+  render();
+  // 현재 활성화된 상태탭도 갱신
+  var activeTab = document.querySelector('.sec.active');
+  if (activeTab) {
+    var id = activeTab.id.replace('sec-status-','');
+    if (['none','order','arrive'].indexOf(id) >= 0) renderStatusTable(id);
+  }
+  gasPost({ action: 'updateStatus', rowNum: idx + 1, status: val });
+  toast(val === '주문완료' ? '🛒 주문완료로 변경됨' : val === '도착' ? '✅ 도착으로 변경됨' : '— 미처리로 변경됨');
+}
+
+// ── 예상금액 미리보기 ─────────────────────────────
+function calcPrev() {
+  var q = parseFloat(document.getElementById('a_qty').value)   || 0;
+  var p = parseFloat(document.getElementById('a_price').value) || 0;
+  var s = parseFloat(document.getElementById('a_ship').value)  || 0;
+  document.getElementById('prevAmt').textContent = '₩' + fmt(q * p + s);
+}
+
+// ── 항목 추가 ────────────────────────────────────
+function addItem() {
+  var teacher = document.getElementById('a_teacher').value.trim();
+  var club    = document.getElementById('a_club').value.trim();
+  var product = document.getElementById('a_product').value.trim();
+  var qty     = parseInt(document.getElementById('a_qty').value) || 0;
+  if (!teacher || !club || !product || qty < 1) {
+    alert('담당교사, 동아리명, 품명, 수량은 필수입니다.'); return;
+  }
+  var newItem = {
+    id:       nid++,
+    teacher:  teacher,
+    club:     club,
+    activity: document.getElementById('a_activity').value,
+    product:  product,
+    spec:     document.getElementById('a_spec').value,
+    qty:      qty,
+    price:    parseFloat(document.getElementById('a_price').value) || 0,
+    ship:     parseFloat(document.getElementById('a_ship').value)  || 0,
+    status:   '-',
+    url:      document.getElementById('a_url').value,
+    memo:     document.getElementById('a_memo').value,
+  };
+  items.push(newItem);
+  ['a_teacher','a_club','a_activity','a_product','a_spec','a_url','a_memo'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('a_qty').value   = '1';
+  document.getElementById('a_price').value = '';
+  document.getElementById('a_ship').value  = '0';
+  document.getElementById('prevAmt').textContent = '₩0';
+  render();
+  go('list', document.querySelectorAll('.tab')[0]);
+  gasPost({ action: 'add', item: newItem });
+  toast('✅ 항목 추가 완료');
+}
+
+// ── 항목 삭제 ────────────────────────────────────
+function delItem(id) {
+  if (!confirm('이 항목을 삭제하시겠습니까?')) return;
+  var idx = items.findIndex(function(o){ return o.id === id; });
+  if (idx < 0) return;
+  var rowNum = idx + 1;
+  items.splice(idx, 1);
+  render();
+  gasPost({ action: 'deleteRow', rowNum: rowNum });
+  toast('🗑 항목 삭제 완료');
+}
+
+// ── 수정 모달 ────────────────────────────────────
+function openM(id) {
+  var o = items.find(function(o){ return o.id === id; }); if (!o) return;
+  document.getElementById('m_id').value = o.id;
+  ['teacher','club','activity','product','spec','url','memo'].forEach(function(k){ document.getElementById('m_'+k).value = o[k] || ''; });
+  ['qty','price','ship'].forEach(function(k){ document.getElementById('m_'+k).value = o[k]; });
+  document.getElementById('mWrap').classList.add('open');
+}
+function closeM() { document.getElementById('mWrap').classList.remove('open'); }
+function saveM() {
+  var id = parseInt(document.getElementById('m_id').value);
+  var o  = items.find(function(o){ return o.id === id; }); if (!o) return;
+  ['teacher','club','activity','product','spec','url','memo'].forEach(function(k){ o[k] = document.getElementById('m_'+k).value; });
+  o.qty   = parseInt(document.getElementById('m_qty').value)   || 1;
+  o.price = parseFloat(document.getElementById('m_price').value) || 0;
+  o.ship  = parseFloat(document.getElementById('m_ship').value)  || 0;
+  var idx = items.indexOf(o);
+  closeM();
+  render();
+  gasPost({ action: 'updateRow', rowNum: idx + 1, item: o });
+  toast('✅ 수정 완료');
+}
+document.getElementById('mWrap').addEventListener('click', function(e){ if(e.target===this) closeM(); });
+
+// ── 탭 전환 ──────────────────────────────────────
+function go(id, btn) {
+  document.querySelectorAll('.sec').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.sidebar-nav .tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'status-none')   renderStatusTable('none');
+  if (id === 'status-order')  renderStatusTable('order');
+  if (id === 'status-arrive') renderStatusTable('arrive');
+}
+
+// ── 초기 로드 + 30초마다 자동 새로고침 ──────────────────────────────
+render();
+loadFromSheet();
+
+var AUTO_REFRESH_SEC = 30;
+var refreshTimer = null;
+var countdown = AUTO_REFRESH_SEC;
+
+function startCountdown() {
+  countdown = AUTO_REFRESH_SEC;
+  updateCountdownUI();
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(function() {
+    countdown--;
+    updateCountdownUI();
+    if (countdown <= 0) {
+      countdown = AUTO_REFRESH_SEC;
+      loadFromSheet();
+    }
+  }, 1000);
+}
+
+function updateCountdownUI() {
+  var el = document.getElementById('refreshCountdown');
+  if (el) el.textContent = countdown + '초 후 자동 새로고침';
+}
+
+startCountdown();
+
+// ── 모바일 카드 뷰 ──
+function isMobile() { return window.innerWidth <= 768; }
+
+function renderCardList(secId, filteredItems) {
+  if (!isMobile()) return;
+  var sec = document.getElementById(secId);
+  if (!sec) return;
+  var wrap = sec.querySelector('.tbl-wrap');
+  if (!wrap) return;
+  var old = wrap.querySelector('.card-list');
+  if (old) old.remove();
+  var list = document.createElement('div');
+  list.className = 'card-list';
+  if (!filteredItems || !filteredItems.length) {
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text2)">항목이 없어요</div>';
+    wrap.appendChild(list);
+    return;
+  }
+  filteredItems.forEach(function(o) {
+    var card = document.createElement('div');
+    var cls = 'order-card';
+    if (o.status === '주문완료') cls += ' row-order';
+    if (o.status === '도착') cls += ' row-arrive';
+    card.className = cls;
+    var amt = (o.qty * o.price + o.ship).toLocaleString();
+    var statusClass = o.status === '주문완료' ? 's-order' : o.status === '도착' ? 's-arrive' : 's-none';
+    var statusLabel = o.status === '주문완료' ? '🛒 주문완료' : o.status === '도착' ? '✅ 도착' : '⏳ 미처리';
+    var nextStatus = o.status === '주문완료' ? '도착' : o.status === '도착' ? '-' : '주문완료';
+    var urlHtml = o.url ? '<a href="' + o.url + '" target="_blank" class="btn btn-sm">🔗</a>' : '';
+    var h = '';
+    h += '<div class="order-card-header">';
+    h += '<div class="order-card-title">' + (o.product || '-') + '</div>';
+    h += '<button class="status-badge ' + statusClass + '" onclick="changeStatus(' + o.id + ',\'' + nextStatus + '\')">' + statusLabel + '</button>';
+    h += '</div>';
+    h += '<div class="order-card-meta">';
+    h += '<span>👤 ' + (o.teacher || '-') + '</span>';
+    h += '<span>🏫 ' + (o.club || '-') + '</span>';
+    h += '<span>📌 ' + (o.activity || '-') + '</span>';
+    if (o.spec) h += '<span>규격: ' + o.spec + '</span>';
+    h += '<span>수량: ' + o.qty + '</span>';
+    h += '<span>단가: ₩' + (o.price || 0).toLocaleString() + '</span>';
+    if (o.ship) h += '<span>배송비: ₩' + o.ship.toLocaleString() + '</span>';
+    h += '</div>';
+    h += '<div class="order-card-footer">';
+    h += '<div class="order-card-price">₩' + amt + '</div>';
+    h += '<div class="order-card-actions">' + urlHtml;
+    h += '<button class="btn btn-sm" onclick="openM(' + o.id + ')">✏️</button>';
+    h += '<button class="btn btn-sm btn-red" onclick="delItem(' + o.id + ')">🗑</button>';
+    h += '</div></div>';
+    card.innerHTML = h;
+    list.appendChild(card);
+  });
+  wrap.appendChild(list);
+}
+
+function goMobile(id, btn) {
+  document.querySelectorAll('.sec').forEach(function(s){ s.classList.remove('active'); });
+  var sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+  document.querySelectorAll('.tab-bar-item').forEach(function(t){ t.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  if (id === 'list') renderCardList('sec-list', items);
+  if (id === 'status-none')   { renderStatusTable('none');   renderCardList('sec-status-none',   items.filter(function(o){ return o.status === '-'; })); }
+  if (id === 'status-order')  { renderStatusTable('order');  renderCardList('sec-status-order',  items.filter(function(o){ return o.status === '주문완료'; })); }
+  if (id === 'status-arrive') { renderStatusTable('arrive'); renderCardList('sec-status-arrive', items.filter(function(o){ return o.status === '도착'; })); }
+  window.scrollTo(0, 0);
+}
+
+window.addEventListener('resize', function() { if (isMobile()) renderCardList('sec-list', items); });
+
+// 모바일 초기 렌더
+if(isMobile()) setTimeout(function(){ renderCardList("sec-list", items); }, 100);
+</script>
+
+
+  <!-- 모바일 하단 탭바 -->
+  <div class="tab-bar">
+    <button class="tab-bar-item active" onclick="goMobile('list',this)"><span class="tbi-icon">📋</span><span>전체</span></button>
+    <button class="tab-bar-item" onclick="goMobile('status-none',this)"><span class="tbi-icon">⏳</span><span>미처리</span></button>
+    <button class="tab-bar-item" onclick="goMobile('status-order',this)"><span class="tbi-icon">🛒</span><span>주문완료</span></button>
+    <button class="tab-bar-item" onclick="goMobile('status-arrive',this)"><span class="tbi-icon">✅</span><span>도착</span></button>
+    <button class="tab-bar-item" onclick="goMobile('add',this)"><span class="tbi-icon">➕</span><span>추가</span></button>
+  </div>
+
+</body></html>
