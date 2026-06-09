@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<!-- saved from url=(0104)file:///C:/Users/User/Downloads/%EB%B9%84%EC%A6%88%EC%BF%A8_%EC%A3%BC%EB%AC%B8%EC%8B%9C%ED%8A%B8_29.html -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비즈쿨 주문시트</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f8f9fa; --text: #202124; --text2: #5f6368; --text3: #9aa0a6;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --blue: #1a73e8; --blue-bg: #e8f0fe; --green: #34a853; --red: #ea4335;
+    --radius: 8px; --radius-lg: 12px;
+  }
+  body { font-family: 'Malgun Gothic','맑은 고딕',-apple-system,BlinkMacSystemFont,sans-serif; background:#f1f3f4; color:var(--text); font-size:13px; min-height:100vh; }
+  .layout { display:flex; min-height:100vh; }
+  .sidebar { width:220px; min-width:220px; background:var(--bg); border-right:1px solid var(--border); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto; z-index:50; flex-shrink:0; transition:width .22s cubic-bezier(.4,0,.2,1), min-width .22s cubic-bezier(.4,0,.2,1); }
+  .sidebar.collapsed { width:0; min-width:0; border-right:none; }
+  .sidebar.collapsed .sidebar-header h2,
+  .sidebar.collapsed .snav-item span:not(.snav-badge),
+  .sidebar.collapsed .snav-item > *:not(.snav-icon):not(.snav-badge),
+  .sidebar.collapsed .snav-divider,
+  .sidebar.collapsed .snav-badge { opacity:0; pointer-events:none; transition:opacity .12s; }
+  .sidebar.collapsed .snav-item { justify-content:center; padding:10px 0; }
+  .sidebar.collapsed .sidebar-header { padding:14px 0; display:flex; justify-content:center; } .sidebar.collapsed .sidebar-header h2 { display:none; }
+  .sidebar-toggle-fixed { position:fixed; top:50%; left:220px; transform:translateY(-50%); background:var(--bg); border:1px solid var(--border); border-left:none; cursor:pointer; color:var(--text2); width:20px; height:56px; border-radius:0 10px 10px 0; display:flex; align-items:center; justify-content:center; font-size:13px; box-shadow:3px 0 8px rgba(0,0,0,.12); transition:left .22s cubic-bezier(.4,0,.2,1), background .12s, color .12s; z-index:200; padding:0; line-height:1; }
+  .sidebar-toggle-fixed:hover { background:var(--bg2); color:var(--blue); }
+  .sidebar-toggle-fixed .toggle-arrow { display:inline-block; transition:transform .22s cubic-bezier(.4,0,.2,1); }
+  .sidebar-toggle-fixed.collapsed { left:0; }
+  .sidebar-toggle-fixed.collapsed .toggle-arrow { transform:rotate(180deg); }
+  .snav-icon { font-size:16px; flex-shrink:0; min-width:20px; text-align:center; }
+  .snav-label { overflow:hidden; white-space:nowrap; transition:opacity .15s; }
+  .sidebar.collapsed .snav-label { opacity:0; width:0; }
+  .sidebar-header { padding:18px 16px 12px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .sidebar-header h2 { font-size:13px; font-weight:700; color:var(--text2); letter-spacing:.5px; text-transform:uppercase; }
+  .sidebar-nav { padding:8px 0; flex:1; }
+  .snav-item { display:flex; align-items:center; gap:8px; padding:9px 16px; font-size:13px; cursor:pointer; border:none; background:transparent; color:var(--text2); width:100%; text-align:left; font-family:inherit; border-radius:0; transition:background .12s, color .12s; position:relative; }
+  .snav-item:hover { background:var(--bg2); color:var(--text); }
+  .snav-item.active { background:var(--blue-bg); color:var(--blue); font-weight:600; }
+  .snav-item.active::before { content:""; position:absolute; left:0; top:4px; bottom:4px; width:3px; background:var(--blue); border-radius:0 3px 3px 0; }
+  .snav-divider { font-size:10px; font-weight:700; color:var(--text3); padding:12px 16px 4px; letter-spacing:.8px; text-transform:uppercase; }
+  .snav-badge { margin-left:auto; background:var(--bg2); border:1px solid var(--border); color:var(--text2); font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; min-width:20px; text-align:center; }
+  .snav-item.active .snav-badge { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .snav-item.sn-none.active   { background:#fff3e0; color:#e65100; } .snav-item.sn-none.active::before { background:#e65100; } .snav-item.sn-none.active .snav-badge { background:#e65100; border-color:#e65100; }
+  .snav-item.sn-order.active  { background:#e1f5fe; color:#0277bd; } .snav-item.sn-order.active::before { background:#0277bd; } .snav-item.sn-order.active .snav-badge { background:#0277bd; border-color:#0277bd; }
+  .snav-item.sn-arrive.active { background:#e8f5e9; color:#2e7d32; } .snav-item.sn-arrive.active::before { background:#2e7d32; } .snav-item.sn-arrive.active .snav-badge { background:#2e7d32; border-color:#2e7d32; }
+  .main { flex:1; min-width:0; }
+  .app { max-width:100%; margin:0; padding:20px 20px 20px; }
+
+  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+  .topbar h1 { font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; }
+
+  .tab-bar { display:flex; border-bottom:1px solid var(--border); margin-bottom:20px; background:var(--bg); border-radius:var(--radius-lg) var(--radius-lg) 0 0; padding:0 4px; }
+  .tab { padding:12px 18px; font-size:13px; cursor:pointer; border:none; background:transparent; color:var(--text2); border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .15s; font-family:inherit; display:flex; align-items:center; gap:6px; }
+  .tab:hover { color:var(--text); } .tab.active { color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
+  .sec { display:none; } .sec.active { display:block; } #sec-add.active { display:flex; justify-content:center; padding:20px 0; }
+
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; font-size:12px; cursor:pointer; border:1px solid var(--border2); background:var(--bg); color:var(--text); border-radius:var(--radius); transition:background .1s,transform .1s; white-space:nowrap; font-family:inherit; height:32px; }
+  .btn:hover { background:var(--bg2); } .btn:active { transform:scale(.98); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .btn-blue  { background:var(--blue);  color:#fff; border-color:var(--blue);  } .btn-blue:hover  { background:#1557b0; }
+  .btn-green { background:var(--green); color:#fff; border-color:var(--green); } .btn-green:hover { background:#1e8e3e; }
+  .btn-red   { background:var(--red);   color:#fff; border-color:var(--red);   } .btn-red:hover   { background:#c5221f; }
+  .btn-sm { height:26px; padding:3px 8px; font-size:11px; }
+
+  .toolbar { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+  .toolbar input, .toolbar select { font-size:12px; padding:5px 9px; height:32px; border:1px solid var(--border2); border-radius:var(--radius); background:var(--bg); color:var(--text); font-family:inherit; }
+  .toolbar input { min-width:160px; }
+  .toolbar input:focus, .toolbar select:focus { outline:2px solid var(--blue); outline-offset:-1px; }
+
+  .sum-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:20px; }
+  .sum-card { background:var(--bg); border-radius:var(--radius); padding:12px 16px; border:1px solid var(--border); }
+  .sum-card .lbl { font-size:11px; color:var(--text2); margin-bottom:4px; }
+  .sum-card .val { font-size:20px; font-weight:600; }
+  .sum-card .val.blue { color:var(--blue); } .sum-card .val.green { color:var(--green); }
+
+  .tbl-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--bg); }
+  table { width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; min-width:1000px; }
+  thead th { padding:10px 8px; font-weight:600; font-size:11px; color:var(--text2); background:var(--bg2); border-bottom:1px solid var(--border); white-space:nowrap; text-align:left; overflow:hidden; text-overflow:ellipsis; }
+  thead th.r { text-align:right; } thead th.c { text-align:center; }
+  tbody tr { border-bottom:1px solid var(--border); transition:background .1s; }
+  tbody tr:last-child { border-bottom:none; } tbody tr:hover { background:var(--bg2); }
+  tbody td { padding:8px; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  tbody td.r { text-align:right; } tbody td.c { text-align:center; }
+
+  .status-sel { font-size:12px; padding:3px 6px; height:28px; border-radius:6px; border:1px solid var(--border2); background:var(--bg); color:var(--text); font-family:inherit; cursor:pointer; width:82px; font-weight:600; }
+  .status-sel.s-order  { background:#e1f5fe; color:#0277bd; border-color:#81d4fa; }
+  .status-sel.s-arrive { background:#e8f5e9; color:#2e7d32; border-color:#a5d6a7; }
+  .status-sel.s-none   { background:var(--bg); color:var(--text2); }
+  tbody tr.row-order  { background:#f0f9ff; }
+  tbody tr.row-arrive { background:#f1f8e9; }
+  tbody tr.row-order:hover  { background:#dff0fa; }
+  tbody tr.row-arrive:hover { background:#e4f3d8; }
+
+  .form-card { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; max-width:900px; }
+  .form-card h3 { font-size:15px; font-weight:600; margin-bottom:16px; }
+  .frow { margin-bottom:12px; }
+  .frow label { display:block; font-size:11px; color:var(--text2); margin-bottom:4px; font-weight:600; }
+  .frow input, .frow select, .frow textarea { width:100%; font-size:13px; padding:8px 10px; border:1px solid var(--border2); border-radius:var(--radius); background:var(--bg); color:var(--text); font-family:inherit; }
+  .frow input:focus, .frow select:focus, .frow textarea:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(26,115,232,.15); }
+  .frow textarea { resize:vertical; min-height:60px; }
+  .f2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .f3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  .form-footer { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid var(--border); margin-top:6px; }
+
+  /* 항목 추가 전용 폼 스타일 */
+  #sec-add .form-card { padding:44px 52px; max-width:780px; width:100%; margin:0 auto; }
+  #sec-add .form-card h3 { font-size:18px; font-weight:700; margin-bottom:24px; }
+  #sec-add .frow { margin-bottom:16px; }
+  #sec-add .frow label { font-size:12px; margin-bottom:6px; }
+  #sec-add .frow input, #sec-add .frow select, #sec-add .frow textarea { font-size:14px; padding:11px 14px; }
+  #sec-add .frow textarea { min-height:80px; }
+  #sec-add .f2 { gap:16px; }
+  #sec-add .f3 { gap:16px; }
+  #sec-add .form-footer { padding-top:20px; margin-top:10px; }
+
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:100; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--bg); border-radius:var(--radius-lg); border:1px solid var(--border); padding:24px; width:100%; max-width:540px; max-height:90vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,.18); }
+  .modal h3 { font-size:16px; font-weight:600; margin-bottom:16px; }
+  .mfooter { display:flex; justify-content:flex-end; gap:8px; margin-top:14px; }
+
+  .empty-msg { text-align:center; padding:3rem; color:var(--text2); font-size:13px; display:none; line-height:2; }
+  a { color:var(--blue); text-decoration:none; } a:hover { text-decoration:underline; }
+
+  .toast { position:fixed; bottom:24px; right:24px; background:#323232; color:#fff; padding:10px 18px; border-radius:var(--radius); font-size:13px; z-index:999; opacity:0; transition:opacity .3s; pointer-events:none; }
+  .toast.show { opacity:1; }
+
+  /* 수령 안내 배너 */
+  .notice-banner { background:linear-gradient(135deg,#e8f5e9,#e3f2fd); border:1px solid #a5d6a7; border-radius:var(--radius); padding:10px 16px; margin-bottom:16px; font-size:12px; color:#1b5e20; display:flex; align-items:center; gap:8px; }
+  .notice-banner strong { color:#0d47a1; }
+
+  /* 상태별 보기 탭 */
+  .status-tab-bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .status-tab { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px 18px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); cursor:pointer; font-size:12px; font-family:inherit; color:var(--text2); transition:all .15s; min-width:90px; }
+  .status-tab .st-cnt { font-size:18px; font-weight:700; color:var(--text); }
+  .status-tab:hover { background:var(--bg2); }
+  .status-tab.active { border-color:var(--blue); background:var(--blue-bg); color:var(--blue); }
+  .status-tab.active .st-cnt { color:var(--blue); }
+  .status-tab.st-none.active  { border-color:#f57c00; background:#fff3e0; color:#e65100; }
+  .status-tab.st-none.active .st-cnt { color:#e65100; }
+  .status-tab.st-order.active { border-color:#0277bd; background:#e1f5fe; color:#0277bd; }
+  .status-tab.st-order.active .st-cnt { color:#0277bd; }
+  .status-tab.st-arrive.active { border-color:var(--green); background:#e8f5e9; color:#2e7d32; }
+  .status-tab.st-arrive.active .st-cnt { color:#2e7d32; }
+
+  /* 상태별 섹션 */
+  .status-view-section { display:none; }
+  .status-view-section.active { display:block; }
+  .sv-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .sv-header h3 { font-size:14px; font-weight:600; }
+  .sv-total { font-size:12px; color:var(--text2); }
+  .sv-empty { text-align:center; padding:2rem; color:var(--text2); font-size:13px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); }
+
+  /* 상태 클릭 버튼 */
+  .status-btn { border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; white-space:nowrap; transition:all .15s; }
+  .status-btn.s-none  { background:#f1f3f4; color:var(--text2); }
+  .status-btn.s-none:hover  { background:#e8eaed; }
+  .status-btn.s-order { background:#e1f5fe; color:#0277bd; }
+  .status-btn.s-order:hover { background:#b3e5fc; }
+  .status-btn.s-arrive { background:#e8f5e9; color:#2e7d32; }
+  .status-btn.s-arrive:hover { background:#c8e6c9; }
+
+  /* 구글 시트 버튼 */
+  .btn-sheet { background:#0f9d58; color:#fff; border-color:#0f9d58; }
+  .btn-sheet:hover { background:#0b8043; }
+
+  /* 하단 고정 네비게이션 (모바일) */
+  .bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:var(--bg); border-top:1px solid var(--border); z-index:200; padding:0; box-shadow:0 -2px 8px rgba(0,0,0,.1); }
+  .bottom-nav-inner { display:flex; }
+  .bnav-btn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px 4px; border:none; background:transparent; color:var(--text2); font-size:10px; cursor:pointer; font-family:inherit; gap:3px; transition:color .15s; }
+  .bnav-btn .bnav-icon { font-size:18px; }
+  .bnav-btn.active { color:var(--blue); }
+  .bnav-btn.active .bnav-label { font-weight:600; }
+
+  @media (max-width:860px) {
+    .sidebar { display:none; }
+    .sidebar-toggle-fixed { display:none; }
+  }
+  @media (max-width:640px) {
+    .app { padding:12px 12px 70px; }
+    .bottom-nav { display:block; }
+    .topbar { margin-bottom:12px; }
+    .topbar h1 { font-size:15px; }
+    .status-tab-bar { gap:6px; }
+    .status-tab { min-width:70px; padding:8px 10px; }
+    .notice-banner { font-size:11px; }
+  }
+</style>
+</head>
+<body>
+<button class="sidebar-toggle-fixed" id="sidebarToggleFixed" onclick="toggleSidebar()" title="사이드바 접기/펼치기">
+  <span class="toggle-arrow">‹</span>
+</button>
+
+<div class="layout">
+
+  <!-- 사이드바 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>메뉴</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="snav-item active" id="snav-list" onclick="go(&#39;list&#39;, null); snavActivate(&#39;list&#39;)">
+        <span class="snav-icon">📋</span><span class="snav-label">전체 목록</span>
+      </button>
+      <button class="snav-item" id="snav-add" onclick="go(&#39;add&#39;, null); snavActivate(&#39;add&#39;)">
+        <span class="snav-icon">➕</span><span class="snav-label">항목 추가</span>
+      </button>
+
+      <div class="snav-divider">상태별 보기</div>
+
+      <button class="snav-item sn-none" id="snav-none" onclick="go(&#39;status&#39;, null); switchStatus(&#39;none&#39;, document.querySelectorAll(&#39;.status-tab&#39;)[0]); snavActivate(&#39;none&#39;)" title="미처리">
+        <span class="snav-icon">⏳</span><span class="snav-label">미처리</span>
+        <span class="snav-badge" id="snavBadgeNone">0</span>
+      </button>
+      <button class="snav-item sn-order" id="snav-order" onclick="go(&#39;status&#39;, null); switchStatus(&#39;order&#39;, document.querySelectorAll(&#39;.status-tab&#39;)[1]); snavActivate(&#39;order&#39;)" title="주문완료">
+        <span class="snav-icon">🛒</span><span class="snav-label">주문완료</span>
+        <span class="snav-badge" id="snavBadgeOrder">0</span>
+      </button>
+      <button class="snav-item sn-arrive" id="snav-arrive" onclick="go(&#39;status&#39;, null); switchStatus(&#39;arrive&#39;, document.querySelectorAll(&#39;.status-tab&#39;)[2]); snavActivate(&#39;arrive&#39;)" title="도착">
+        <span class="snav-icon">✅</span><span class="snav-label">도착</span>
+        <span class="snav-badge" id="snavBadgeArrive">0</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="main">
+<div class="app">
+
+  <div class="notice-banner">
+    📦 <span>도착 물품 수령 안내 | 도착한 물품은 <strong>N104</strong>에서 수령 부탁드립니다.</span>
+  </div>
+
+  <div class="topbar">
+    <h1>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1"></rect><path d="M9 12h6M9 16h4"></path></svg>
+      비즈쿨 주문시트
+    </h1>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <a href="https://docs.google.com/spreadsheets" target="_blank" class="btn btn-sheet" style="text-decoration:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"></path></svg>
+        구글 시트 열기
+      </a>
+      <span id="refreshCountdown" style="font-size:11px;color:var(--text2)">15초 후 자동 새로고침</span>
+      <button class="btn btn-green" onclick="loadFromSheet();startCountdown();" id="btnLoad">↻ 새로고침</button>
+    </div>
+  </div>
+
+  <!-- 주문 목록 -->
+  <div class="sec active" id="sec-list">
+    <div class="sum-bar" id="sumBar"><div class="sum-card"><div class="lbl">전체 항목</div><div class="val blue">0건</div></div><div class="sum-card"><div class="lbl">미처리</div><div class="val">0건</div></div><div class="sum-card"><div class="lbl">주문완료</div><div class="val">0건</div></div><div class="sum-card"><div class="lbl">도착</div><div class="val green">0건</div></div><div class="sum-card"><div class="lbl">예상 총액</div><div class="val blue">₩0</div></div></div>
+    <div class="toolbar">
+      <input type="text" id="srch" placeholder="품명, 담당교사, 동아리 검색..." oninput="render()">
+      <select id="fTeacher" onchange="render()"><option value="">전체 담당교사</option></select>
+      <select id="fClub" onchange="render()"><option value="">전체 동아리</option></select>
+      <select id="fStatus" onchange="render()">
+        <option value="">전체 상태</option>
+        <option value="-">-</option>
+        <option value="주문완료">주문완료</option>
+        <option value="도착">도착</option>
+      </select>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <colgroup>
+          <col style="width:36px"><col style="width:66px"><col style="width:98px"><col style="width:70px">
+          <col style="width:185px"><col style="width:44px"><col style="width:44px">
+          <col style="width:74px"><col style="width:58px"><col style="width:78px">
+          <col style="width:86px"><col style="width:130px"><col style="width:90px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>순번</th><th>담당교사</th>
+            <th>동아리명</th>
+            <th>활동명<br><span style="font-weight:400">간단</span></th>
+            <th>품명</th><th>규격</th><th class="r">수량</th>
+            <th class="r">예산단가</th><th class="r">배송비</th><th class="r">예상금액</th>
+            <th class="c">상태</th><th>구매처/사이트</th><th class="c">관리</th>
+          </tr>
+        </thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+    <div class="empty-msg" id="emptyMsg" style="display: block;">
+      📭<br>항목이 없습니다.<br>
+      항목 추가 탭에서 등록하거나 <strong>새로고침</strong>을 눌러주세요.
+    </div>
+  </div>
+
+  <!-- 상태별 보기 -->
+  <div class="sec" id="sec-status">
+    <div class="status-tab-bar" id="statusTabBar">
+      <button class="status-tab st-none active" onclick="switchStatus(&#39;none&#39;,this)">
+        <span>⏳ 미처리</span><span class="st-cnt" id="stCntNone">0</span>
+      </button>
+      <button class="status-tab st-order" onclick="switchStatus(&#39;order&#39;,this)">
+        <span>🛒 주문완료</span><span class="st-cnt" id="stCntOrder">0</span>
+      </button>
+      <button class="status-tab st-arrive" onclick="switchStatus(&#39;arrive&#39;,this)">
+        <span>✅ 도착</span><span class="st-cnt" id="stCntArrive">0</span>
+      </button>
+    </div>
+
+    <!-- 미처리 -->
+    <div class="status-view-section active" id="sv-none">
+      <div class="sv-header">
+        <h3>⏳ 미처리 항목</h3>
+        <span class="sv-total" id="svTotalNone">0건 | 💰 예상 총액 ₩0</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <colgroup>
+            <col style="width:36px"><col style="width:66px"><col style="width:98px"><col style="width:70px">
+            <col style="width:185px"><col style="width:44px"><col style="width:44px">
+            <col style="width:74px"><col style="width:58px"><col style="width:78px">
+            <col style="width:86px"><col style="width:130px"><col style="width:90px">
+          </colgroup>
+          <thead><tr>
+            <th>순번</th><th>담당교사</th><th>동아리명</th><th>활동명<br><span style="font-weight:400">간단</span></th>
+            <th>품명</th><th>규격</th><th class="r">수량</th>
+            <th class="r">예산단가</th><th class="r">배송비</th><th class="r">예상금액</th>
+            <th class="c">상태</th><th>구매처/사이트</th><th class="c">관리</th>
+          </tr></thead>
+          <tbody id="svBodyNone"></tbody>
+        </table>
+      </div>
+      <div class="sv-empty" id="svEmptyNone" style="display: block;">✅ 미처리 항목이 없어요!</div>
+    </div>
+
+    <!-- 주문완료 -->
+    <div class="status-view-section" id="sv-order">
+      <div class="sv-header">
+        <h3>🛒 주문완료 항목</h3>
+        <span class="sv-total" id="svTotalOrder">0건 | 💰 예상 총액 ₩0</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <colgroup>
+            <col style="width:36px"><col style="width:66px"><col style="width:98px"><col style="width:70px">
+            <col style="width:185px"><col style="width:44px"><col style="width:44px">
+            <col style="width:74px"><col style="width:58px"><col style="width:78px">
+            <col style="width:86px"><col style="width:130px"><col style="width:90px">
+          </colgroup>
+          <thead><tr>
+            <th>순번</th><th>담당교사</th><th>동아리명</th><th>활동명<br><span style="font-weight:400">간단</span></th>
+            <th>품명</th><th>규격</th><th class="r">수량</th>
+            <th class="r">예산단가</th><th class="r">배송비</th><th class="r">예상금액</th>
+            <th class="c">상태</th><th>구매처/사이트</th><th class="c">관리</th>
+          </tr></thead>
+          <tbody id="svBodyOrder"></tbody>
+        </table>
+      </div>
+      <div class="sv-empty" id="svEmptyOrder" style="display: block;">🛒 주문완료 항목이 없어요.</div>
+    </div>
+
+    <!-- 도착 -->
+    <div class="status-view-section" id="sv-arrive">
+      <div class="sv-header">
+        <h3>✅ 도착 항목</h3>
+        <span class="sv-total" id="svTotalArrive">0건 | 💰 예상 총액 ₩0</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <colgroup>
+            <col style="width:36px"><col style="width:66px"><col style="width:98px"><col style="width:70px">
+            <col style="width:185px"><col style="width:44px"><col style="width:44px">
+            <col style="width:74px"><col style="width:58px"><col style="width:78px">
+            <col style="width:86px"><col style="width:130px"><col style="width:90px">
+          </colgroup>
+          <thead><tr>
+            <th>순번</th><th>담당교사</th><th>동아리명</th><th>활동명<br><span style="font-weight:400">간단</span></th>
+            <th>품명</th><th>규격</th><th class="r">수량</th>
+            <th class="r">예산단가</th><th class="r">배송비</th><th class="r">예상금액</th>
+            <th class="c">상태</th><th>구매처/사이트</th><th class="c">관리</th>
+          </tr></thead>
+          <tbody id="svBodyArrive"></tbody>
+        </table>
+      </div>
+      <div class="sv-empty" id="svEmptyArrive" style="display: block;">📦 도착한 항목이 없어요.</div>
+    </div>
+  </div>
+
+  <!-- 항목 추가 -->
+  <div class="sec" id="sec-add">
+    <div class="form-card">
+      <h3>✏️ 신규 주문 항목 입력</h3>
+      <div class="f3">
+        <div class="frow"><label>담당교사 *</label><input id="a_teacher" placeholder="담당교사 이름 입력"></div>
+        <div class="frow"><label>동아리명 *</label><input id="a_club" placeholder="예: 에너지 환경 탐구"></div>
+        <div class="frow"><label>활동명 간단 *</label><input id="a_activity" placeholder="예: 발명교육"></div>
+      </div>
+      <div class="f2">
+        <div class="frow"><label>품명 *</label><input id="a_product" placeholder="예: 내경 16mm PVC 호스"></div>
+        <div class="frow"><label>규격</label><input id="a_spec" placeholder="예: m, 개, 250g"></div>
+      </div>
+      <div class="f3">
+        <div class="frow"><label>수량 *</label><input type="number" id="a_qty" placeholder="1" min="1" value="1" oninput="calcPrev()"></div>
+        <div class="frow"><label>예산단가 (원) *</label><input type="number" id="a_price" placeholder="0" min="0" oninput="calcPrev()"></div>
+        <div class="frow"><label>배송비 (원)</label><input type="number" id="a_ship" placeholder="0" min="0" value="0" oninput="calcPrev()"></div>
+      </div>
+      <div class="frow"><label>구매처/사이트 URL</label><input id="a_url" placeholder="https://smartstore.naver.com/..."></div>
+      <div class="frow"><label>메모</label><textarea id="a_memo" placeholder="특이사항 등"></textarea></div>
+      <div class="form-footer">
+        <span style="font-size:12px;color:var(--text2)">예상금액: <strong id="prevAmt" style="color:var(--text)">₩0</strong></span>
+        <button class="btn btn-blue" onclick="addItem()">➕ 항목 추가</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 수정 모달 -->
+  <div class="modal-overlay" id="mWrap">
+    <div class="modal">
+      <h3>✏️ 항목 수정</h3>
+      <input type="hidden" id="m_id">
+      <div class="f3">
+        <div class="frow"><label>담당교사</label><input id="m_teacher" placeholder="담당교사 이름 입력"></div>
+        <div class="frow"><label>동아리명</label><input id="m_club"></div>
+        <div class="frow"><label>활동명</label><input id="m_activity"></div>
+      </div>
+      <div class="f2">
+        <div class="frow"><label>품명</label><input id="m_product"></div>
+        <div class="frow"><label>규격</label><input id="m_spec"></div>
+      </div>
+      <div class="f3">
+        <div class="frow"><label>수량</label><input type="number" id="m_qty" min="1"></div>
+        <div class="frow"><label>예산단가</label><input type="number" id="m_price" min="0"></div>
+        <div class="frow"><label>배송비</label><input type="number" id="m_ship" min="0"></div>
+      </div>
+      <div class="frow"><label>구매처/사이트</label><input id="m_url"></div>
+      <div class="frow"><label>메모</label><textarea id="m_memo"></textarea></div>
+      <div class="mfooter">
+        <button class="btn" onclick="closeM()">취소</button>
+        <button class="btn btn-blue" onclick="saveM()">저장</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- main -->
+</div><!-- layout -->
+
+<div class="toast" id="toast">✅ 0건 불러오기 완료</div>
+
+<!-- 하단 고정 네비게이션 (모바일) -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn active" id="bnav-list" onclick="go(&#39;list&#39;,null);updateBnav(&#39;list&#39;)">
+      <span class="bnav-icon">📋</span>
+      <span class="bnav-label">전체</span>
+    </button>
+    <button class="bnav-btn" id="bnav-status" onclick="go(&#39;status&#39;,null);updateBnav(&#39;status&#39;)">
+      <span class="bnav-icon">⏳</span>
+      <span class="bnav-label">미처리 <span id="bnavNoneCnt">0</span></span>
+    </button>
+    <button class="bnav-btn" id="bnav-status2" onclick="go(&#39;status&#39;,null);switchStatus(&#39;order&#39;,document.querySelectorAll(&#39;.status-tab&#39;)[1]);updateBnav(&#39;status&#39;)">
+      <span class="bnav-icon">🛒</span>
+      <span class="bnav-label">주문완료</span>
+    </button>
+    <button class="bnav-btn" id="bnav-status3" onclick="go(&#39;status&#39;,null);switchStatus(&#39;arrive&#39;,document.querySelectorAll(&#39;.status-tab&#39;)[2]);updateBnav(&#39;status&#39;)">
+      <span class="bnav-icon">✅</span>
+      <span class="bnav-label">도착</span>
+    </button>
+    <button class="bnav-btn" id="bnav-add" onclick="go(&#39;add&#39;,null);updateBnav(&#39;add&#39;)">
+      <span class="bnav-icon">➕</span>
+      <span class="bnav-label">추가</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+// ════════════════════════════════════════════════
+//  Apps Script 배포 URL
+const GAS_URL = 'https://script.google.com/a/macros/cnsa.hs.kr/s/AKfycbx0Gax5UZVNBiJOPhpqJ5IdoF7QWGD14IfwT2913JeJzN3pW300apIuhgVlMEhvcLJU0Q/exec';
+// ════════════════════════════════════════════════
+
+let items = [];
+let nid = 1;
+
+// ── 토스트 알림 ──────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2500);
+}
+
+// ── 숫자 포맷 ────────────────────────────────────
+function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
+
+// ── 시트에서 불러오기 (JSONP - 학교 도메인 CORS 우회) ────────────────
+function loadFromSheet() {
+  const btn = document.getElementById('btnLoad');
+  btn.disabled = true;
+  btn.textContent = '불러오는 중...';
+
+  const cbName = '__cb_' + Date.now();
+  const script = document.createElement('script');
+
+  const timer = setTimeout(function() {
+    cleanup();
+    btn.disabled = false;
+    btn.textContent = '↻ 새로고침';
+    toast('❌ 응답 시간 초과. URL 및 배포 설정을 확인하세요.');
+  }, 10000);
+
+  function cleanup() {
+    clearTimeout(timer);
+    if (script.parentNode) script.parentNode.removeChild(script);
+    delete window[cbName];
+  }
+
+  window[cbName] = function(data) {
+    cleanup();
+    btn.disabled = false;
+    btn.textContent = '↻ 새로고침';
+    if (typeof startCountdown === 'function') startCountdown();
+    if (data && data.success && Array.isArray(data.items)) {
+      items = data.items;
+      nid = items.length + 1;
+      render();
+      populateTeacherSelects();
+      toast('✅ ' + items.length + '건 불러오기 완료');
+    } else {
+      toast('❌ 불러오기 실패: ' + ((data && data.error) || '오류'));
+    }
+  };
+
+  script.onerror = function() {
+    cleanup();
+    btn.disabled = false;
+    btn.textContent = '↻ 새로고침';
+    toast('❌ 스크립트 로드 실패. URL을 확인하세요.');
+  };
+
+  script.src = GAS_URL + '?callback=' + cbName + '&_=' + Date.now();
+  document.head.appendChild(script);
+}
+
+// ── GET 쿼리스트링 방식으로 데이터 전송 (file:// 완벽 호환) ─────────
+function gasPost(payload) {
+  const json = encodeURIComponent(JSON.stringify(payload));
+  const url = GAS_URL + '?action_data=' + json;
+  // 응답 읽기 불필요 - no-cors fetch로 전송
+  try { fetch(url, { mode: 'no-cors' }).catch(function(){}); } catch(e) {}
+}
+
+// ── 요약 카드 ────────────────────────────────────
+function renderSummary() {
+  const total   = items.reduce(function(s,o){ return s + o.qty * o.price + o.ship; }, 0);
+  const arrive  = items.filter(function(o){ return o.status === '도착'; }).length;
+  const ordered = items.filter(function(o){ return o.status === '주문완료'; }).length;
+  const none    = items.filter(function(o){ return o.status === '-'; }).length;
+  document.getElementById('sumBar').innerHTML =
+    '<div class="sum-card"><div class="lbl">전체 항목</div><div class="val blue">' + items.length + '건</div></div>' +
+    '<div class="sum-card"><div class="lbl">미처리</div><div class="val">' + none + '건</div></div>' +
+    '<div class="sum-card"><div class="lbl">주문완료</div><div class="val">' + ordered + '건</div></div>' +
+    '<div class="sum-card"><div class="lbl">도착</div><div class="val green">' + arrive + '건</div></div>' +
+    '<div class="sum-card"><div class="lbl">예상 총액</div><div class="val blue">₩' + fmt(total) + '</div></div>';
+}
+
+// ── 필터 옵션 ────────────────────────────────────
+function populateFilters() {
+  function setOpts(id, arr, label) {
+    var el = document.getElementById(id); var v = el.value;
+    el.innerHTML = '<option value="">' + label + '</option>' +
+      arr.map(function(a){ return '<option value="' + a + '">' + a + '</option>'; }).join('');
+    el.value = v;
+  }
+  setOpts('fTeacher', [...new Set(items.map(function(o){ return o.teacher; }))], '전체 담당교사');
+  setOpts('fClub',    [...new Set(items.map(function(o){ return o.club; }))],    '전체 동아리');
+}
+
+// ── 담당교사 목록 (시트에서 불러온 후 동적으로도 채워짐) ─────────
+var TEACHERS = [];
+
+function populateTeacherSelects() { /* input 방식으로 변경되어 불필요 */ }
+
+// ── 상태별 보기 탭 전환 ───────────────────────────────
+var curStatusView = 'none';
+function switchStatus(key, btn) {
+  curStatusView = key;
+  document.querySelectorAll('.status-view-section').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('sv-' + key).classList.add('active');
+  document.querySelectorAll('.status-tab').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+}
+
+// ── 사이드바 접기/펼치기 ──────────────────────────────
+function toggleSidebar() {
+  var sb  = document.getElementById('sidebar');
+  var btn = document.getElementById('sidebarToggleFixed');
+  sb.classList.toggle('collapsed');
+  btn.classList.toggle('collapsed');
+}
+
+// ── 사이드바 활성화 ──────────────────────────────────
+function snavActivate(key) {
+  document.querySelectorAll('.snav-item').forEach(function(el){ el.classList.remove('active'); });
+  var el = document.getElementById('snav-' + key);
+  if (el) el.classList.add('active');
+  // 하단 네비도 동기화
+  updateBnav(key === 'none' || key === 'order' || key === 'arrive' ? 'status' : key);
+}
+
+// ── 상태별 테이블 행 생성 헬퍼 ─────────────────────────
+function makeRow(o, i, gIdx) {
+  var amt = o.qty * o.price + o.ship;
+  var urlCell = o.url
+    ? '<a href="'+o.url+'" target="_blank" style="font-size:11px">🔗 링크</a>'
+    : '<span style="color:var(--text3)">-</span>';
+  var rowClass = o.status==='주문완료'?'row-order':o.status==='도착'?'row-arrive':'';
+  var btnClass = o.status==='주문완료'?'s-order':o.status==='도착'?'s-arrive':'s-none';
+  var btnLabel = o.status==='주문완료'?'🛒 주문완료':o.status==='도착'?'✅ 도착':'⏳ -';
+  return '<tr class="'+rowClass+'">'+
+    '<td style="color:var(--text2);text-align:center">'+(i+1)+'</td>'+
+    '<td>'+o.teacher+'</td>'+
+    '<td style="white-space:normal;line-height:1.4;font-size:11px">'+o.club+'</td>'+
+    '<td style="font-size:11px">'+o.activity+'</td>'+
+    '<td title="'+o.product+'" style="white-space:normal;line-height:1.4;font-size:12px">'+o.product+'</td>'+
+    '<td style="color:var(--text2)">'+(o.spec||'')+'</td>'+
+    '<td class="r">'+fmt(o.qty)+'</td>'+
+    '<td class="r">₩'+fmt(o.price)+'</td>'+
+    '<td class="r">'+(o.ship>0?'₩'+fmt(o.ship):'0')+'</td>'+
+    '<td class="r"><strong>₩'+fmt(amt)+'</strong></td>'+
+    '<td class="c"><button class="status-btn '+btnClass+'" onclick="cycleStatus('+gIdx+')">'+btnLabel+'</button></td>'+
+    '<td>'+urlCell+'</td>'+
+    '<td class="c" style="white-space:nowrap">'+
+      '<button class="btn btn-sm" onclick="openM('+o.id+')" title="수정">✏️</button> '+
+      '<button class="btn btn-sm btn-red" onclick="delItem('+o.id+')" title="삭제">🗑</button>'+
+    '</td></tr>';
+}
+
+// ── 상태별 보기 렌더링 ────────────────────────────────
+function renderStatusView() {
+  var groups = { none: [], order: [], arrive: [] };
+  items.forEach(function(o) {
+    if (o.status === '주문완료') groups.order.push(o);
+    else if (o.status === '도착') groups.arrive.push(o);
+    else groups.none.push(o);
+  });
+
+  // 카운트 업데이트
+  document.getElementById('stCntNone').textContent   = groups.none.length;
+  document.getElementById('stCntOrder').textContent  = groups.order.length;
+  document.getElementById('stCntArrive').textContent = groups.arrive.length;
+
+  // 하단 네비 미처리 수
+  var bnavEl = document.getElementById('bnavNoneCnt');
+  if (bnavEl) bnavEl.textContent = groups.none.length;
+
+  // 사이드바 배지 업데이트
+  var bn = document.getElementById('snavBadgeNone');   if(bn) bn.textContent = groups.none.length;
+  var bo = document.getElementById('snavBadgeOrder');  if(bo) bo.textContent = groups.order.length;
+  var ba = document.getElementById('snavBadgeArrive'); if(ba) ba.textContent = groups.arrive.length;
+
+  // 각 그룹 렌더
+  [
+    { key: 'none',  data: groups.none,   bodyId: 'svBodyNone',   emptyId: 'svEmptyNone',   totalId: 'svTotalNone'  },
+    { key: 'order', data: groups.order,  bodyId: 'svBodyOrder',  emptyId: 'svEmptyOrder',  totalId: 'svTotalOrder' },
+    { key: 'arrive',data: groups.arrive, bodyId: 'svBodyArrive', emptyId: 'svEmptyArrive', totalId: 'svTotalArrive'}
+  ].forEach(function(g) {
+    var body  = document.getElementById(g.bodyId);
+    var empty = document.getElementById(g.emptyId);
+    var total = document.getElementById(g.totalId);
+    if (!body) return;
+    var amt = g.data.reduce(function(s,o){ return s+o.qty*o.price+o.ship; }, 0);
+    if (total) total.textContent = g.data.length + '건 | 💰 예상 총액 ₩' + fmt(amt);
+    if (!g.data.length) {
+      body.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+    } else {
+      if (empty) empty.style.display = 'none';
+      body.innerHTML = g.data.map(function(o, i) {
+        return makeRow(o, i, items.indexOf(o));
+      }).join('');
+    }
+  });
+}
+
+// ── 하단 네비 활성화 업데이트 ───────────────────────────
+function updateBnav(key) {
+  ['bnav-list','bnav-status','bnav-status2','bnav-status3','bnav-add'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  if (key === 'list') { var el = document.getElementById('bnav-list'); if(el) el.classList.add('active'); }
+  if (key === 'add')  { var el = document.getElementById('bnav-add');  if(el) el.classList.add('active'); }
+}
+
+// ── 테이블 렌더링 ─────────────────────────────────
+function render() {
+  var q  = document.getElementById('srch').value.toLowerCase();
+  var ft = document.getElementById('fTeacher').value;
+  var fc = document.getElementById('fClub').value;
+  var fs = document.getElementById('fStatus').value;
+  var filtered = items.filter(function(o) {
+    return (!q  || o.product.toLowerCase().includes(q) || o.teacher.toLowerCase().includes(q) || o.club.toLowerCase().includes(q)) &&
+           (!ft || o.teacher === ft) && (!fc || o.club === fc) && (!fs || o.status === fs);
+  });
+  var tbody = document.getElementById('tBody');
+  var empty = document.getElementById('emptyMsg');
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map(function(o, i) {
+      var gIdx = items.indexOf(o);
+      var amt  = o.qty * o.price + o.ship;
+      var urlCell = o.url
+        ? '<a href="' + o.url + '" target="_blank" style="font-size:11px">🔗 링크</a>'
+        : '<span style="color:var(--text3)">-</span>';
+      var rowClass = o.status === '주문완료' ? 'row-order' : o.status === '도착' ? 'row-arrive' : '';
+      var btnClass = o.status === '주문완료' ? 's-order' : o.status === '도착' ? 's-arrive' : 's-none';
+      var btnLabel = o.status === '주문완료' ? '🛒 주문완료' : o.status === '도착' ? '✅ 도착' : '⏳ -';
+      return '<tr class="' + rowClass + '">' +
+        '<td style="color:var(--text2);text-align:center">' + (i+1) + '</td>' +
+        '<td>' + o.teacher + '</td>' +
+        '<td style="white-space:normal;line-height:1.4;font-size:11px">' + o.club + '</td>' +
+        '<td style="font-size:11px">' + o.activity + '</td>' +
+        '<td title="' + o.product + '" style="white-space:normal;line-height:1.4;font-size:12px">' + o.product + '</td>' +
+        '<td style="color:var(--text2)">' + (o.spec||'') + '</td>' +
+        '<td class="r">' + fmt(o.qty) + '</td>' +
+        '<td class="r">₩' + fmt(o.price) + '</td>' +
+        '<td class="r">' + (o.ship > 0 ? '₩' + fmt(o.ship) : '0') + '</td>' +
+        '<td class="r"><strong>₩' + fmt(amt) + '</strong></td>' +
+        '<td class="c"><button class="status-btn ' + btnClass + '" onclick="cycleStatus(' + gIdx + ')">' + btnLabel + '</button></td>' +
+        '<td>' + urlCell + '</td>' +
+        '<td class="c" style="white-space:nowrap">' +
+          '<button class="btn btn-sm" onclick="openM(' + o.id + ')" title="수정">✏️</button> ' +
+          '<button class="btn btn-sm btn-red" onclick="delItem(' + o.id + ')" title="삭제">🗑</button>' +
+        '</td></tr>';
+    }).join('');
+  }
+  renderSummary();
+  populateFilters();
+  renderStatusView();
+  populateTeacherSelects();
+}
+
+// ── 상태 변경 ────────────────────────────────────
+function cycleStatus(idx) {
+  var order = ['-', '주문완료', '도착'];
+  var cur = items[idx].status;
+  var next = order[(order.indexOf(cur) + 1) % order.length];
+  changeStatus(idx, next);
+}
+
+function changeStatus(idx, val) {
+  items[idx].status = val;
+  render();
+  gasPost({ action: 'updateStatus', rowNum: idx + 1, status: val });
+  var label = val === '주문완료' ? '🔵 주문완료' : val === '도착' ? '🟢 도착' : '-';
+  toast('상태 변경: ' + label);
+}
+
+// ── 예상금액 미리보기 ─────────────────────────────
+function calcPrev() {
+  var q = parseFloat(document.getElementById('a_qty').value)   || 0;
+  var p = parseFloat(document.getElementById('a_price').value) || 0;
+  var s = parseFloat(document.getElementById('a_ship').value)  || 0;
+  document.getElementById('prevAmt').textContent = '₩' + fmt(q * p + s);
+}
+
+// ── 항목 추가 ────────────────────────────────────
+function addItem() {
+  var teacher = document.getElementById('a_teacher').value.trim();
+  var club    = document.getElementById('a_club').value.trim();
+  var product = document.getElementById('a_product').value.trim();
+  var qty     = parseInt(document.getElementById('a_qty').value) || 0;
+  if (!teacher || !club || !product || qty < 1) {
+    alert('담당교사, 동아리명, 품명, 수량은 필수입니다.'); return;
+  }
+  var newItem = {
+    id:       nid++,
+    teacher:  teacher,
+    club:     club,
+    activity: document.getElementById('a_activity').value,
+    product:  product,
+    spec:     document.getElementById('a_spec').value,
+    qty:      qty,
+    price:    parseFloat(document.getElementById('a_price').value) || 0,
+    ship:     parseFloat(document.getElementById('a_ship').value)  || 0,
+    status:   '-',
+    url:      document.getElementById('a_url').value,
+    memo:     document.getElementById('a_memo').value,
+  };
+  items.push(newItem);
+  ['a_teacher','a_club','a_activity','a_product','a_spec','a_url','a_memo'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('a_qty').value   = '1';
+  document.getElementById('a_price').value = '';
+  document.getElementById('a_ship').value  = '0';
+  document.getElementById('prevAmt').textContent = '₩0';
+  render();
+  go('list', null); snavActivate('list');
+  gasPost({ action: 'add', item: newItem });
+  toast('✅ 항목 추가 완료');
+}
+
+// ── 항목 삭제 ────────────────────────────────────
+function delItem(id) {
+  if (!confirm('이 항목을 삭제하시겠습니까?')) return;
+  var idx = items.findIndex(function(o){ return o.id === id; });
+  if (idx < 0) return;
+  var rowNum = idx + 1;
+  items.splice(idx, 1);
+  render();
+  gasPost({ action: 'deleteRow', rowNum: rowNum });
+  toast('🗑 항목 삭제 완료');
+}
+
+// ── 수정 모달 ────────────────────────────────────
+function openM(id) {
+  var o = items.find(function(o){ return o.id === id; }); if (!o) return;
+  document.getElementById('m_id').value = o.id;
+  ['teacher','club','activity','product','spec','url','memo'].forEach(function(k){ document.getElementById('m_'+k).value = o[k] || ''; });
+  ['qty','price','ship'].forEach(function(k){ document.getElementById('m_'+k).value = o[k]; });
+  document.getElementById('mWrap').classList.add('open');
+}
+function closeM() { document.getElementById('mWrap').classList.remove('open'); }
+function saveM() {
+  var id = parseInt(document.getElementById('m_id').value);
+  var o  = items.find(function(o){ return o.id === id; }); if (!o) return;
+  ['teacher','club','activity','product','spec','url','memo'].forEach(function(k){ o[k] = document.getElementById('m_'+k).value; });
+  o.qty   = parseInt(document.getElementById('m_qty').value)   || 1;
+  o.price = parseFloat(document.getElementById('m_price').value) || 0;
+  o.ship  = parseFloat(document.getElementById('m_ship').value)  || 0;
+  var idx = items.indexOf(o);
+  closeM();
+  render();
+  gasPost({ action: 'updateRow', rowNum: idx + 1, item: o });
+  toast('✅ 수정 완료');
+}
+document.getElementById('mWrap').addEventListener('click', function(e){ if(e.target===this) closeM(); });
+
+// ── 탭 전환 ──────────────────────────────────────
+function go(id, btn) {
+  document.querySelectorAll('.sec').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('sec-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  // 사이드바 기본 활성화 (상태별은 snavActivate로 따로 처리)
+  if (id === 'list') snavActivate('list');
+  if (id === 'add')  snavActivate('add');
+}
+
+// ── 초기 로드 + 30초마다 자동 새로고침 ──────────────────────────────
+render();
+loadFromSheet();
+
+var AUTO_REFRESH_SEC = 30;
+var refreshTimer = null;
+var countdown = AUTO_REFRESH_SEC;
+
+function startCountdown() {
+  countdown = AUTO_REFRESH_SEC;
+  updateCountdownUI();
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(function() {
+    countdown--;
+    updateCountdownUI();
+    if (countdown <= 0) {
+      countdown = AUTO_REFRESH_SEC;
+      loadFromSheet();
+    }
+  }, 1000);
+}
+
+function updateCountdownUI() {
+  var el = document.getElementById('refreshCountdown');
+  if (el) el.textContent = countdown + '초 후 자동 새로고침';
+}
+
+startCountdown();
+</script>
+
+
+</body></html>
